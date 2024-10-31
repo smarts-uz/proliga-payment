@@ -5,7 +5,7 @@ export class ClickRequestDto {
     merchant_user_id?: string;
     merchant_trans_id: string;
     param2?: string;
-    amount: number;
+    price: number;
     action: 0 | 1;
     error: 0 | 1;
     error_note: string;

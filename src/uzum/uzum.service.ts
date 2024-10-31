@@ -42,7 +42,7 @@ export class UzumService {
     const name = createTransactionDto.transId
     const serviceId = createTransactionDto.serviceId;
     const transId = createTransactionDto.transId;
-    const amount = new Decimal(createTransactionDto.amount);
+    const price = new Decimal(createTransactionDto.price);
 
     if (!this.checkServiceId(serviceId)) {
       throw this.createBadRequestError(serviceId, ErrorStatusCode.ErrorCheckingPaymentData);
@@ -58,12 +58,12 @@ export class UzumService {
 
     const transaction = await this.prismaService.pay_balance.create({
       data: {
-        transaction_id: transId,
+        transaction_id: Number(transId),
         user_id: Number(createTransactionDto.params.userId),
-        price: amount,
-        system: 'Uzum',
+        price:  Number(price),
+        system: 'uzum',
         status: 'PENDING',
-        createdAt: new Date(),
+        created_at: new Date(),
         name: name
       },
     });
@@ -74,7 +74,7 @@ export class UzumService {
       status: ResponseStatus.Created,
       transTime: new Date().valueOf(),
       transId: transaction.transaction_id,
-      amount: createTransactionDto.amount,
+      price: createTransactionDto.price,
     };
   }
 
@@ -101,7 +101,7 @@ export class UzumService {
     await this.prismaService.pay_balance.update({
       where: { id: Number(transId) },
       data: {
-        performTime: new Date(),
+        updated_at: new Date(),
         status: 'PAID',
       },
     });
@@ -133,7 +133,7 @@ export class UzumService {
     await this.prismaService.pay_balance.update({
       where: { id: Number(transId) },
       data: {
-        cancelTime: new Date(),
+        created_at: new Date(),
         status: 'CANCELED',
       },
     });
@@ -143,7 +143,7 @@ export class UzumService {
       transId,
       status: ResponseStatus.Reversed,
       reverseTime: new Date().valueOf(),
-      amount: transaction.price,
+      price: transaction.price,
     };
   }
 

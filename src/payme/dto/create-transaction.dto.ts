@@ -5,10 +5,9 @@ export class CreateTransactionDto {
   params: {
     id: string;
     time: number;
-    amount: number;
+    price: number;
     account: {
       user_id: string;
-      planId: string;
     };
   };
 }

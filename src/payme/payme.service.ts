@@ -41,13 +41,13 @@ export class PaymeService {
 
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
     const userId = Number(checkPerformTransactionDto.params?.account?.user_id);
-    const amount = checkPerformTransactionDto.params.amount;
+    const price = checkPerformTransactionDto.params.price;
 
     const balance = await this.prismaService.pay_balance.findUnique({
       where: { id: userId },
     });
 
-    if (!balance || typeof balance.price !== 'number' || balance.price < amount) {
+    if (!balance || typeof balance.price !== 'number' || balance.price < price) {
       return {
         error: {
           code: ErrorStatusCodes.TransactionNotAllowed,
@@ -65,19 +65,19 @@ export class PaymeService {
 
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const userId = Number(createTransactionDto.params?.account?.user_id);
-    const amount = createTransactionDto.params.amount;
+    const price = createTransactionDto.params.price;
 
     const balance = await this.prismaService.pay_balance.findUnique({
       where: { id: userId },
     });
 
-    if (!balance || typeof balance.price !== 'number' || balance.price < amount) {
+    if (!balance || typeof balance.price !== 'number' || balance.price < price) {
       return { error: PaymeError.InsufficientFunds };
     }
 
     const newBalance = await this.prismaService.pay_balance.update({
       where: { id: userId },
-      data: { price: { decrement: amount } },
+      data: { price: { decrement: price } },
     });
 
     return {
@@ -106,19 +106,19 @@ export class PaymeService {
         result: {
           state: transaction.state,
           transaction: transaction.id,
-          perform_time: transaction.performTime ? new Date(transaction.performTime).getTime() : null,
+          perform_time: transaction.updated_at ? new Date(transaction.updated_at).getTime() : null,
         },
       };
     }
 
-    const isExpired = this.checkTransactionExpiration(transaction.createdAt);
+    const isExpired = this.checkTransactionExpiration(transaction.created_at);
 
     if (isExpired) {
       await this.prismaService.pay_balance.update({
         where: { id: transaction.id },
         data: {
           status: 'CANCELED',
-          cancelTime: new Date(),
+          canceled_at: new Date(),
           state: TransactionState.PendingCanceled,
           reason: Number(CancelingReasons.CanceledDueToTimeout),
         },
@@ -141,7 +141,7 @@ export class PaymeService {
       data: {
         status: 'PAID', 
         state: TransactionState.Paid,
-        performTime,
+        updated_at: performTime,
       },
     });
 
@@ -171,14 +171,14 @@ export class PaymeService {
         data: {
           status: TransactionState.PaidCanceled,
           state: TransactionState.PendingCanceled,
-          cancelTime: new Date(),
+          canceled_at: new Date(),
           reason: cancelTransactionDto.params.reason,
         },
       });
 
       return {
         result: {
-          cancel_time: canceledTransaction.cancelTime?.getTime(),
+          cancel_time: canceledTransaction.canceled_at?.getTime(),
           transaction: canceledTransaction.id,
           state: TransactionState.PendingCanceled,
         },
@@ -189,7 +189,7 @@ export class PaymeService {
       result: {
         state: transaction.state,
         transaction: transaction.id,
-        cancel_time: transaction.cancelTime?.getTime(),
+        cancel_time: transaction.canceled_at?.getTime(),
       },
     };
   }
@@ -197,11 +197,11 @@ export class PaymeService {
   async getStatement(getStatementDto: GetStatementDto) {
     const transactions = await this.prismaService.pay_balance.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(getStatementDto.params.from),
           lte: new Date(getStatementDto.params.to),
         },
-        system: 'Payme',
+        system: 'payme',
       },
     });
 
@@ -209,12 +209,12 @@ export class PaymeService {
       result: {
         transactions: transactions.map((transaction) => ({
           id: transaction.id,
-          time: new Date(transaction.createdAt).getTime(),
-          amount: transaction.price,
+          time: new Date(transaction.created_at).getTime(),
+          price: transaction.price,
           account: { user_id: transaction.user_id },
-          create_time: new Date(transaction.createdAt).getTime(),
-          perform_time: transaction.performTime ? new Date(transaction.performTime).getTime() : null,
-          cancel_time: transaction.cancelTime ? new Date(transaction.cancelTime).getTime() : null,
+          create_time: new Date(transaction.created_at).getTime(),
+          perform_time: transaction.updated_at ? new Date(transaction.updated_at).getTime() : null,
+          cancel_time: transaction.canceled_at ? new Date(transaction.canceled_at).getTime() : null,
           state: transaction.state,
           reason: transaction.reason || null,
         })),

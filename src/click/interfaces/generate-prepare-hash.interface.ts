@@ -4,7 +4,7 @@ export interface GenerateMd5HashParams {
     secretKey: string;
     merchantTransId: string;
     merchantPrepareId?: number;
-    amount: number;
+    price: number;
     action: number;
     signTime: string;
   }

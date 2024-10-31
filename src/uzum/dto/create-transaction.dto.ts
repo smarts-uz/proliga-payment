@@ -3,10 +3,9 @@ export class CreateTransactionDto {
     timestamp: number;
     transId: string;
     params: {
-      planId: string;
       userId: string;
       [key: string]: any;
     };
-    amount: number;
+    price: number;
   }
   

@@ -1,4 +1,4 @@
-import { TransactionStatus } from "@prisma/client";
+// import { TransactionStatus } from "@prisma/client";
 
 export const TransactionState: any  = {
     Paid: 2,

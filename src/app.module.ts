@@ -6,8 +6,11 @@ import { UzumModule } from './uzum/uzum.model';
 import { PaymeModule } from './payme/payme.module';
 
 @Module({
-  imports: [ClickModule],
+  imports: [ClickModule, PaymeModule, UzumModule],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
+
+// bu error emas bazaga push qilish mumkin emas hozircha chunki bu real project bazasi !

@@ -22,7 +22,7 @@ export class ClickService {
   async handleMerchantTransactions(clickReqBody: ClickRequestDto) {
     const actionType = +clickReqBody.action;
 
-    clickReqBody.amount = parseFloat(clickReqBody.amount + '');
+    clickReqBody.price = parseFloat(clickReqBody.price + '');
 
     switch (actionType) {
       case TransactionActions.Prepare:
@@ -39,7 +39,7 @@ export class ClickService {
 
   async prepare(clickReqBody: ClickRequestDto) {
     const userId = clickReqBody.param2; // Assuming this is a string
-    const amount = clickReqBody.amount; // Ensure amount is a number
+    const price = clickReqBody.price; // Ensure amount is a number
     const transId = clickReqBody.click_trans_id + ''; // Ensure transId is a string
     const signString = clickReqBody.sign_string;
   
@@ -49,7 +49,7 @@ export class ClickService {
       serviceId: clickReqBody.service_id,
       secretKey: this.secretKey,
       merchantTransId: clickReqBody.merchant_trans_id,
-      amount: amount, // Ensure it's a string if needed
+      price: price, // Ensure it's a string if needed
       action: clickReqBody.action,
       signTime: clickReqBody.sign_time,
     };
@@ -73,7 +73,7 @@ export class ClickService {
 
     const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
       where: {
-        transaction_id: transId,
+        transaction_id: Number(transId),
         status: 'PAID',
       },
     });
@@ -130,14 +130,13 @@ export class ClickService {
     await this.prismaService.pay_balance.create({
       data: {
         user_id: Number(userId),               
-        transaction_id: transId,               
-        prepareId: time.getTime(),              
+        transaction_id: Number(transId),                 
         status: 'PENDING',                     
-        system: 'Click',                       
-        price: clickReqBody.amount, 
-        createdAt: time,                        
-        updatedAt: time,                      
-        name: 'Your Name Here',                 
+        system: 'click',                       
+        price: clickReqBody.price, 
+        created_at: time,                        
+        updated_at: time,                      
+        name: userId,                 
       },
     });
 
@@ -154,7 +153,7 @@ export class ClickService {
     const userId = clickReqBody.param2;
     const prepareId = clickReqBody.merchant_prepare_id;
     const transId = clickReqBody.click_trans_id + '';
-    const amount = clickReqBody.amount;
+    const price = clickReqBody.price;
     const signString = clickReqBody.sign_string;
 
     const myMD5Params = {
@@ -163,7 +162,7 @@ export class ClickService {
       secretKey: this.secretKey,
       merchantTransId: clickReqBody.merchant_trans_id,
       merchantPrepareId: prepareId,
-      amount,
+      price,
       action: clickReqBody.action,
       signTime: clickReqBody.sign_time,
     };
@@ -201,7 +200,6 @@ export class ClickService {
 
     const isPrepared = await this.prismaService.pay_balance.findFirst({
       where: {
-        prepareId: +prepareId,
         user_id: Number(userId),
       },
     });
@@ -215,8 +213,7 @@ export class ClickService {
 
     const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
       where: {
-        transaction_id: transId,
-        prepareId: +prepareId,
+        transaction_id: Number(transId),
         status: 'PAID',
       },
     });
@@ -228,10 +225,10 @@ export class ClickService {
       };
     }
 
-    if (amount !== isPrepared.price.toNumber()) {
+    if (price !== isPrepared.price) {
       return {
         error: ClickError.InvalidAmount,
-        error_note: 'Invalid amount',
+        error_note: 'Invalid price',
       };
     }
 
