@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 // import { Decimal } from '@prisma/client'; 
 import { validate as isUuid } from 'uuid';
 import { ClickError } from 'src/enum/Payment.enum';
+import {GenerateMd5HashParams} from 'src/click/interfaces/generate-prepare-hash.interface'
 
 @Injectable()
 export class ClickService {
@@ -41,21 +42,35 @@ export class ClickService {
     const planId = clickReqBody.merchant_trans_id;
     const userId = clickReqBody.param2;
     const price = clickReqBody.price;
-    const transId = clickReqBody.click_trans_id + ''; // ! in db transId is string
+    const transId = clickReqBody.click_trans_id.toString(); 
     const signString = clickReqBody.sign_string;
 
-    const myMD5Params = {
-      clickTransId: transId,
-      serviceId: clickReqBody.service_id,
-      secretKey: this.secretKey,
-      merchantTransId: planId,
-      price: price,
-      action: clickReqBody.action,
-      signTime: clickReqBody.sign_time,
+    // const as = await this.prismaService.pay_balance.findUnique({
+    //   where: {
+    //     id: Number(12),
+    //   },
+    // });
+    // console.log("s", as)
+
+    
+    const myMD5Params: GenerateMd5HashParams = {
+        clickTransId: transId,
+        serviceId: clickReqBody.service_id,
+        secretKey: this.secretKey,
+        merchantTransId: userId,
+        price: price,
+        action: clickReqBody.action,
+        signTime: clickReqBody.sign_time,
     };
 
+    
     const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-    console.log('Generated MD5 Hash:', myMD5Hash);
+    console.log(userId);
+    // console.log('Incoming time:', clickReqBody.sign_time);
+    // console.log('Incoming sign_string:', signString);
+    console.log('Generated sign_string:', myMD5Hash);
+    // console.log('Generated user:', userId);
+
 
     if (signString !== myMD5Hash) {
       return {
@@ -268,6 +283,7 @@ export class ClickService {
   }
 
   private checkObjectId(id: string) {
+    console.log("oddiy id", id)
     return isUuid(id);
   }
 }

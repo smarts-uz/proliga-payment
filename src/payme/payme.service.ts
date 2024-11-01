@@ -40,13 +40,42 @@ export class PaymeService {
   }
 
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
-    const userId = Number(checkPerformTransactionDto.params?.account?.user_id);
+    // Check if user_id is provided in the request
+    const userId = checkPerformTransactionDto.params?.account?.user_id;
+    if (!userId) {
+      return {
+        error: {
+          code: ErrorStatusCodes.MissingUserId,
+          message: {
+            uz: 'Foydalanuvchi identifikatori kiritilmagan',
+            en: 'User ID is missing',
+            ru: 'Идентификатор пользователя отсутствует',
+          },
+        },
+      };
+    }
+  
+    // Parse userId to a number
+    const parsedUserId = Number(userId);
+    if (isNaN(parsedUserId)) {
+      return {
+        error: {
+          code: ErrorStatusCodes.InvalidUserId,
+          message: {
+            uz: 'Foydalanuvchi identifikatori noto‘g‘ri',
+            en: 'Invalid user ID',
+            ru: 'Неверный идентификатор пользователя',
+          },
+        },
+      };
+    }
+  
     const price = checkPerformTransactionDto.params.price;
-
+  
     const balance = await this.prismaService.pay_balance.findUnique({
-      where: { id: userId },
+      where: { id: parsedUserId },
     });
-
+  
     if (!balance || typeof balance.price !== 'number' || balance.price < price) {
       return {
         error: {
@@ -59,9 +88,10 @@ export class PaymeService {
         },
       };
     }
-
+  
     return { result: { allow: true } };
   }
+  
 
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const userId = Number(createTransactionDto.params?.account?.user_id);
