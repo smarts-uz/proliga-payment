@@ -70,7 +70,7 @@ export class PaymeService {
   
     const price = checkPerformTransactionDto.params.amount;
   
-    const balance = await this.prismaService.pay_balance.findUnique({
+    const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: parsedUserId },
     });
   

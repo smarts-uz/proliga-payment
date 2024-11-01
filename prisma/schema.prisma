@@ -207,12 +207,30 @@ model news {
   @@ignore
 }
 
+model users{
+  id             Int             @id @default(autoincrement())
+  name           String
+  lastname       String
+}
+
+model subscribtion {
+  id             Int             @id @default(autoincrement()) 
+  price          Float
+}
+
+model usersub { 
+  id             Int             @id @default(autoincrement())
+  user_id        Int?
+  subs_id        Int?
+}
+
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_balance {
   id             Int             @id @default(autoincrement())
   name           String?         @db.VarChar(255)
   user_id        Int?
+  subs_id        Int?
   price          Int?
   system         pay_system_ext?
   transaction_id Int?
