@@ -38,22 +38,24 @@ export class ClickService {
   }
 
   async prepare(clickReqBody: ClickRequestDto) {
-    const userId = clickReqBody.param2; // Assuming this is a string
-    const price = clickReqBody.price; // Ensure amount is a number
-    const transId = clickReqBody.click_trans_id + ''; // Ensure transId is a string
+    const planId = clickReqBody.merchant_trans_id;
+    const userId = clickReqBody.param2;
+    const price = clickReqBody.price;
+    const transId = clickReqBody.click_trans_id + ''; // ! in db transId is string
     const signString = clickReqBody.sign_string;
-  
-    // Prepare MD5 parameters
+
     const myMD5Params = {
       clickTransId: transId,
       serviceId: clickReqBody.service_id,
       secretKey: this.secretKey,
-      merchantTransId: clickReqBody.merchant_trans_id,
-      price: price, // Ensure it's a string if needed
+      merchantTransId: planId,
+      price: price,
       action: clickReqBody.action,
       signTime: clickReqBody.sign_time,
     };
+
     const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
+    console.log('Generated MD5 Hash:', myMD5Hash);
 
     if (signString !== myMD5Hash) {
       return {

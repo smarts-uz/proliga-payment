@@ -95,87 +95,70 @@ model club {
   created_by       Int?
   updated_by       Int?
   deleted_by       Int?
-
-  @@index([id], map: "club_id_index")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model company {
-  id                            Int       @id @default(autoincrement())
-  name                          String?   @unique @db.VarChar(255)
-  location                      String?
-  address                       String?
-  inn                           String?   @db.VarChar(255)
-  mfo                           String?   @db.VarChar(255)
-  rs                            String?   @db.VarChar(255)
-  logo                          String?   @db.VarChar(255)
-  phone                         String?   @db.VarChar(255)
-  website                       String?   @db.VarChar(255)
-  founded                       DateTime? @db.Timestamptz(0)
-  expiration_time               DateTime? @db.Timestamptz(6)
-  last_notified                 DateTime? @db.Timestamptz(0)
-  telegram_notification         Boolean?
-  email_notification            Boolean?
-  sms_notification              Boolean?
-  notification_date             Int?
-  created_at                    DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at                    DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at                    DateTime? @db.Timestamptz(6)
-  created_by                    Int?
-  updated_by                    Int?
-  deleted_by                    Int?
-  user_company_created_byTouser user?     @relation("company_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull, map: "card_created_by_fkey")
-  user_company_deleted_byTouser user?     @relation("company_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull, map: "card_deleted_by_fkey")
-  user_company_updated_byTouser user?     @relation("company_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull, map: "card_updated_by_fkey")
-  user_user_company_idTocompany user[]    @relation("user_company_idTocompany")
-
-  @@index([name], map: "name_company_copy1")
+  id                    Int       @id @default(autoincrement())
+  name                  String?   @db.VarChar(255)
+  location              String?
+  address               String?
+  inn                   String?   @db.VarChar(255)
+  mfo                   String?   @db.VarChar(255)
+  rs                    String?   @db.VarChar(255)
+  logo                  String?   @db.VarChar(255)
+  phone                 String?   @db.VarChar(255)
+  website               String?   @db.VarChar(255)
+  founded               DateTime? @db.Timestamptz(0)
+  expiration_time       DateTime? @db.Timestamptz(6)
+  last_notified         DateTime? @db.Timestamptz(0)
+  telegram_notification Boolean?
+  email_notification    Boolean?
+  sms_notification      Boolean?
+  notification_date     Int?
+  created_at            DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at            DateTime? @db.Timestamptz(6)
+  created_by            Int?
+  updated_by            Int?
+  deleted_by            Int?
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model competition {
-  title                             String    @db.VarChar(255)
-  counter                           String?   @db.VarChar(255)
-  country_id                        Int?
-  flag                              String?   @db.VarChar(255)
-  id                                Int       @id(map: "_copy_2") @default(autoincrement())
-  name                              String?   @db.VarChar(255)
-  name_ru                           String?   @db.VarChar(255)
-  slug                              String?   @db.VarChar(255)
-  competition_link                  String?   @db.VarChar(255)
-  can_register                      Boolean?
-  team_count                        Int?
-  average_team_point                Float?    @db.Real
-  sum_of_team_point                 Int?
-  deadline                          DateTime? @db.Timestamptz(6)
-  created_at                        DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at                        DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at                        DateTime? @db.Timestamptz(6)
-  created_by                        Int?
-  updated_by                        Int?
-  deleted_by                        Int?
-  user_competition_created_byTouser user?     @relation("competition_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull, map: "card_created_by_fkey")
-  user_competition_deleted_byTouser user?     @relation("competition_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull, map: "card_deleted_by_fkey")
-  user_competition_updated_byTouser user?     @relation("competition_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull, map: "card_updated_by_fkey")
-  country                           country?  @relation(fields: [country_id], references: [id], onUpdate: SetNull)
-  team                              team[]
+  title              String    @db.VarChar(255)
+  counter            String?   @db.VarChar(255)
+  country_id         Int?
+  flag               String?   @db.VarChar(255)
+  id                 Int       @id(map: "_copy_2") @default(autoincrement())
+  name               String?   @db.VarChar(255)
+  name_ru            String?   @db.VarChar(255)
+  slug               String?   @db.VarChar(255)
+  competition_link   String?   @db.VarChar(255)
+  can_register       Boolean?
+  team_count         Int?
+  average_team_point Float?    @db.Real
+  sum_of_team_point  Int?
+  deadline           DateTime? @db.Timestamptz(6)
+  created_at         DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at         DateTime? @db.Timestamptz(6)
+  created_by         Int?
+  updated_by         Int?
+  deleted_by         Int?
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model country {
-  id                            Int           @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
-  name                          String?       @db.VarChar(255)
-  flag_url                      String?       @db.VarChar(255)
-  created_at                    DateTime?     @default(now()) @db.Timestamptz(6)
-  updated_at                    DateTime?     @default(now()) @db.Timestamptz(6)
-  deleted_at                    DateTime?     @db.Timestamptz(6)
-  created_by                    Int?
-  updated_by                    Int?
-  deleted_by                    Int?
-  competition                   competition[]
-  user_country_created_byTouser user?         @relation("country_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull)
-  user_country_deleted_byTouser user?         @relation("country_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull)
-  user_country_updated_byTouser user?         @relation("country_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull)
+  id         Int       @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
+  name       String?   @db.VarChar(255)
+  flag_url   String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at DateTime? @db.Timestamptz(6)
+  created_by Int?
+  updated_by Int?
+  deleted_by Int?
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -227,12 +210,12 @@ model news {
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_balance {
-  id             Int             @id @default(autoincrement()) // Ensure this is marked as the primary key
+  id             Int             @id @default(autoincrement())
   name           String?         @db.VarChar(255)
   user_id        Int?
   price          Int?
   system         pay_system_ext?
-  transaction_id Int?            // You might want to consider adding a unique constraint here if applicable
+  transaction_id Int?
   currency_code  Int?            @db.SmallInt
   state          Int?            @db.SmallInt
   updated_time   DateTime?       @db.Timestamptz(6)
@@ -246,11 +229,7 @@ model pay_balance {
   updated_by     Int?
   deleted_by     Int?
   status         String?
-
-  // Consider adding a unique constraint here if necessary
-  // @@unique([transaction_id]) // Uncomment and adjust if you want transaction_id to be unique
 }
-
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -442,7 +421,6 @@ model season {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-  team       team[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -505,207 +483,6 @@ model system_notification {
   @@ignore
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model team {
-  id                      Int          @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_3") @default(autoincrement())
-  name                    String?      @unique(map: "name_unique") @db.VarChar(255)
-  user_id                 Int?
-  competition_id          Int?
-  formation               forma?       @default(dbgenerated("4-3-3"))
-  DEF                     Int?         @db.SmallInt
-  MID                     Int?         @db.SmallInt
-  STR                     Int?         @db.SmallInt
-  registered_tour_id      Int?
-  season_id               Int?
-  point                   Float?       @default(0) @db.Real
-  order                   Int?         @default(0)
-  balance                 Float?       @default(100) @db.Real
-  is_team_created         Boolean      @default(false)
-  count_of_transfers      Int?         @default(2)
-  transfers_from_one_team Int?         @default(2)
-  created_at              DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at              DateTime?    @default(now()) @db.Timestamptz(6)
-  deleted_at              DateTime?    @db.Timestamptz(6)
-  created_by              Int?
-  updated_by              Int?
-  deleted_by              Int?
-  last_tour_point         Int?         @default(0)
-  competition             competition? @relation(fields: [competition_id], references: [id], onUpdate: SetNull)
-  season                  season?      @relation(fields: [season_id], references: [id], onUpdate: SetNull)
-  user                    user?        @relation(fields: [user_id], references: [id], onUpdate: SetNull)
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model team_player {
-  id             Int              @default(autoincrement())
-  player_id      Int?
-  order_number   Int?             @db.SmallInt
-  is_captain     Boolean?         @default(false)
-  team_id        Int?
-  position       player_position?
-  club_id        Int?
-  name           String?          @db.VarChar(255)
-  price          Float?           @db.Real
-  tour_id        Int?
-  competition_id Int?
-  user_id        Int?
-  created_at     DateTime?        @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime?        @default(now()) @db.Timestamptz(6)
-  deleted_at     DateTime?        @db.Timestamptz(6)
-  created_by     Int?
-  updated_by     Int?
-  deleted_by     Int?
-  point          Int?             @db.SmallInt
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model tour {
-  id               BigInt       @default(autoincrement())
-  name             String?      @db.VarChar(255)
-  competition_name String?      @db.VarChar(255)
-  season_name      String?      @db.VarChar
-  competition_id   Int?
-  season_id        Int?
-  datetime_start   DateTime?    @db.Timestamptz(6)
-  status           tour_status?
-  order            Int?
-  datetime_end     DateTime?    @db.Timestamptz(0)
-  created_at       DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at       DateTime?    @default(now()) @db.Timestamptz(6)
-  deleted_at       DateTime?    @db.Timestamptz(6)
-  created_by       Int?
-  updated_by       Int?
-  deleted_by       Int?
-  is_last          Boolean?     @default(false)
-  is_copy          Boolean?     @default(false)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model tour_team {
-  id                         Int       @default(autoincrement())
-  user_id                    Int?
-  tour_id                    Int?
-  purchased_players          Int?      @db.SmallInt
-  is_purchase_locked         Boolean?
-  team_id                    Int?
-  price                      Float?    @db.Real
-  point                      Float?    @default(0) @db.Real
-  competition_id             Int?
-  season_id                  Int?
-  captain_id                 Int?
-  current_count_of_transfers Int?      @default(0)
-  created_at                 DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at                 DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at                 DateTime? @db.Timestamptz(6)
-  created_by                 Int?
-  updated_by                 Int?
-  deleted_by                 Int?
-  name                       String?   @db.VarChar(255)
-  is_last                    Boolean?  @default(false)
-
-  @@ignore
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model user {
-  id                                       Int           @id @default(autoincrement())
-  guid                                     String?       @db.Uuid
-  company_id                               Int?
-  role                                     roles?        @default(user)
-  name                                     String?       @db.VarChar(255)
-  email                                    String        @unique(map: "user_email_idx") @db.VarChar(255)
-  phone                                    String?       @unique(map: "user_phone_idx") @db.VarChar(255)
-  is_active                                Boolean?
-  photo                                    String?
-  is_super_admin                           Boolean?
-  phone_second                             String?       @db.VarChar(255)
-  phone_telegram                           String?       @db.VarChar(255)
-  notes                                    String?
-  is_developer                             Boolean?
-  telegram_user                            String?       @db.VarChar(255)
-  grid_resize                              Json?
-  grid_drag_drop                           Json?
-  is_notified                              Boolean?
-  sms_code                                 String?       @db.VarChar(255)
-  sms_created_at                           DateTime?     @db.Timestamptz(6)
-  last_name                                String?
-  middle_name                              String?
-  gender                                   String?
-  birth_date                               DateTime?     @db.Date
-  bio                                      String?
-  balance                                  Float?
-  created_at                               DateTime?     @db.Timestamptz(6)
-  updated_at                               DateTime?     @db.Timestamptz(6)
-  deleted_at                               DateTime?     @db.Timestamptz(6)
-  created_by                               Int?
-  updated_by                               Int?
-  deleted_by                               Int?
-  language                                 language?     @default(uz)
-  enable_notification                      Boolean?      @default(true)
-  phone_verified                           Boolean?
-  company_company_created_byTouser         company[]     @relation("company_created_byTouser")
-  company_company_deleted_byTouser         company[]     @relation("company_deleted_byTouser")
-  company_company_updated_byTouser         company[]     @relation("company_updated_byTouser")
-  competition_competition_created_byTouser competition[] @relation("competition_created_byTouser")
-  competition_competition_deleted_byTouser competition[] @relation("competition_deleted_byTouser")
-  competition_competition_updated_byTouser competition[] @relation("competition_updated_byTouser")
-  country_country_created_byTouser         country[]     @relation("country_created_byTouser")
-  country_country_deleted_byTouser         country[]     @relation("country_deleted_byTouser")
-  country_country_updated_byTouser         country[]     @relation("country_updated_byTouser")
-  team                                     team[]
-  company_user_company_idTocompany         company?      @relation("user_company_idTocompany", fields: [company_id], references: [id], onUpdate: SetNull)
-
-  @@index([name], map: "name_user_copy1")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model user_activity {
-  id             Int         @default(autoincrement())
-  user_id        Int?
-  activity       user_event?
-  team_id        Int?
-  name_uz        String?
-  created_at     DateTime?   @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime?   @default(now()) @db.Timestamptz(6)
-  deleted_at     DateTime?   @db.Timestamptz(6)
-  created_by     Int?
-  updated_by     Int?
-  deleted_by     Int?
-  name_ru        String?
-  name_en        String?
-  tour_id        Int?
-  competition_id Int?
-  name           String?     @db.VarChar(255)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model user_prize {
-  id              Int     @default(autoincrement())
-  name            String? @db.VarChar(255)
-  competition_id  Int?
-  season_id       Int?
-  team_id         Int?
-  user_id         Int?
-  prize_id        Int?
-  team_point      Int?
-  prize_order     Int?    @db.SmallInt
-  updated_by      Int?
-  last_tour_point Int?    @default(0)
-
-  @@ignore
-}
-
 enum System {
   Payme
   Click
@@ -762,12 +539,12 @@ enum customer_type {
 }
 
 enum forma {
-    A     // 3-5-2 @map("3-5-2")
-    B     // 3-4-3 @map("3-4-3")
-    C     // 4-3-3 @map("4-3-3")
-    D     // 5-3-2 @map("5-3-2")
-    E     // 5-4-1 @map("5-4-1")
-    F     // 4-4-2 @map("4-4-2")
+  A
+  B
+  C
+  D
+  E
+  F
 }
 
 enum formas {

@@ -13,4 +13,3 @@ import { PaymeModule } from './payme/payme.module';
 export class AppModule {}
 
 
-// bu error emas bazaga push qilish mumkin emas hozircha chunki bu real project bazasi !
