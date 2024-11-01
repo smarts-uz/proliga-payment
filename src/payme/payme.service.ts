@@ -40,7 +40,6 @@ export class PaymeService {
   }
 
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
-    // Check if user_id is provided in the request
     const userId = checkPerformTransactionDto.params?.account?.user_id;
     if (!userId) {
       return {
@@ -55,7 +54,6 @@ export class PaymeService {
       };
     }
   
-    // Parse userId to a number
     const parsedUserId = Number(userId);
     if (isNaN(parsedUserId)) {
       return {
@@ -70,7 +68,7 @@ export class PaymeService {
       };
     }
   
-    const price = checkPerformTransactionDto.params.price;
+    const price = checkPerformTransactionDto.params.amount;
   
     const balance = await this.prismaService.pay_balance.findUnique({
       where: { id: parsedUserId },
