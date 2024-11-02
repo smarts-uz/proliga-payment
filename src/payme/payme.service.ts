@@ -11,6 +11,7 @@ import { ErrorStatusCodes } from './constants/error-status-codes';
 import { PaymeError } from './constants/payme-error';
 import { DateTime } from 'luxon';
 import { TransactionState } from './constants/transaction-state';
+import { log } from 'node:console';
 
 export const CancelingReasons = {
     CanceledDueToTimeout: 'Canceled due to timeout',
@@ -23,6 +24,8 @@ export class PaymeService {
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
+    console.log("a", method);
+    
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformTransaction(reqBody as CheckPerformTransactionDto);
@@ -68,13 +71,16 @@ export class PaymeService {
       };
     }
   
-    const price = checkPerformTransactionDto.params.amount;
+    const price = checkPerformTransactionDto.params.amount / 100;
+    // console.log(price);
+    
   
     const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: parsedUserId },
     });
   
     if (!balance || typeof balance.price !== 'number' || balance.price < price) {
+      // console.log("ll", balance)
       return {
         error: {
           code: ErrorStatusCodes.TransactionNotAllowed,
@@ -93,27 +99,107 @@ export class PaymeService {
 
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const userId = Number(createTransactionDto.params?.account?.user_id);
-    const price = createTransactionDto.params.price;
+    const amount = createTransactionDto.params.amount;
 
-    const balance = await this.prismaService.pay_balance.findUnique({
+    const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: userId },
     });
+    console.log("balance", balance);
+    
 
-    if (!balance || typeof balance.price !== 'number' || balance.price < price) {
+    if (!balance || typeof balance.price !== 'number' || balance.price < amount / 100) {
       return { error: PaymeError.InsufficientFunds };
     }
 
-    const newBalance = await this.prismaService.pay_balance.update({
-      where: { id: userId },
-      data: { price: { decrement: price } },
-    });
+    const transid = await this.prismaService.pay_balance.findFirst({
+      where: {transaction_id : createTransactionDto.params.id}
+    })
 
-    return {
-      result: {
-        balance: newBalance.price,
-        transactionId: createTransactionDto.params.id,
-      },
+    console.log(":l:", transid);
+    
+    if (transid != null){
+      console.log("ifga kirdi");
+      console.log(transid.status)
+      
+      if (transid.status !== 'pending') {        
+        return {
+            error: PaymeError.CantDoOperation,
+            id: transid.transaction_id,
+        };
+        }
+      if (this.checkTransactionExpiration(transid.created_at)) {
+        await this.prismaService.pay_balance.update({
+          where: {id : transid.id},
+          data :  {
+            status: 'canceled',
+            canceled_at: new Date(),
+            state: TransactionState.PendingCanceled,
+        }
+        })
+        console.log("method", this.checkTransactionExpiration);
+        console.log(this.checkTransactionExpiration(transid.created_at));
+        
+        
+        return {
+            error: {
+                ...PaymeError.CantDoOperation,
+                state: TransactionState.PendingCanceled,
+                reason: CancelingReasons.CanceledDueToTimeout,
+            },
+            id: transid.transaction_id,
+        };
+      }     
+    
+      return {
+        result: {
+            balance: transid.price,
+            transaction: transid.transaction_id,
+            state: TransactionState.Pending,
+            create_time: new Date(transid.created_at).getTime(),
+        },
     };
+    }
+
+    const checkTransaction: CheckPerformTransactionDto = {
+      method: TransactionMethods.CheckPerformTransaction,
+      params: {
+          amount: balance.price * 100,
+          account: {
+            user_id : userId.toString(),
+          },
+      },
+  };
+
+  const checkResult = await this.checkPerformTransaction(
+      checkTransaction,
+  );
+
+  if (checkResult.error) {
+      return {
+          error: checkResult.error,
+          id: transid.transaction_id,
+      };
+  }
+
+  const newTransaction = await this.prismaService.pay_balance.create({
+    data: {
+      user_id: userId,
+      price: balance.price - amount, // Deducting the amount from the user's current balance
+      transaction_id: createTransactionDto.params.id, // Assuming `transaction_id` is required
+      state: 1, // Or set it according to your business logic
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+  });
+
+  return {
+      result: {
+          balance: newTransaction.price,
+          transaction: createTransactionDto.params.id,
+          state: TransactionState.Pending,
+          create_time: new Date(newTransaction.created_at).getTime(),
+      },
+  };
   }
 
   async performTransaction(performTransactionDto: PerformTransactionDto) {
@@ -250,13 +336,25 @@ export class PaymeService {
     };
   }
 
-  private checkTransactionExpiration(createdAt: Date): boolean {
-    const transactionCreatedAt = new Date(createdAt);
-    const timeoutDuration = 720; // 12 hours
-    const timeoutThreshold = DateTime.now()
-      .minus({ minutes: timeoutDuration })
-      .toJSDate();
 
-    return transactionCreatedAt < timeoutThreshold;
-  }
+  private checkTransactionExpiration(created_at: Date) {
+    const transactioncreated_at = new Date(created_at);
+    const timeoutDuration = 1;
+    const timeoutThreshold = DateTime.now()
+        .minus({
+            minutes: timeoutDuration,
+        })
+        .toJSDate();
+
+    return transactioncreated_at < timeoutThreshold;
+}
+  // private checkTransactionExpiration(createdAt: Date): boolean {
+  //   const transactionCreatedAt = new Date(createdAt);
+  //   const timeoutDuration = 720; // 12 hours
+  //   const timeoutThreshold = DateTime.now()
+  //     .minus({ minutes: timeoutDuration })
+  //     .toJSDate();
+
+  //   return transactionCreatedAt < timeoutThreshold;
+  // }
 }

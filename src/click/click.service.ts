@@ -90,7 +90,7 @@ export class ClickService {
 
     const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
       where: {
-        transaction_id: Number(transId),
+        transaction_id: transId,
         status: 'PAID',
       },
     });
@@ -147,7 +147,7 @@ export class ClickService {
     await this.prismaService.pay_balance.create({
       data: {
         user_id: Number(userId),               
-        transaction_id: Number(transId),                 
+        transaction_id: transId,                 
         status: 'PENDING',                     
         system: 'click',                       
         price: clickReqBody.price, 
@@ -230,7 +230,7 @@ export class ClickService {
 
     const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
       where: {
-        transaction_id: Number(transId),
+        transaction_id: transId,
         status: 'PAID',
       },
     });

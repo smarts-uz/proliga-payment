@@ -58,7 +58,7 @@ export class UzumService {
 
     const transaction = await this.prismaService.pay_balance.create({
       data: {
-        transaction_id: Number(transId),
+        transaction_id: transId,
         user_id: Number(createTransactionDto.params.userId),
         price:  Number(price),
         system: 'uzum',

@@ -233,7 +233,7 @@ model pay_balance {
   subs_id        Int?
   price          Int?
   system         pay_system_ext?
-  transaction_id Int?
+  transaction_id String?
   currency_code  Int?            @db.SmallInt
   state          Int?            @db.SmallInt
   updated_time   DateTime?       @db.Timestamptz(6)
@@ -246,7 +246,7 @@ model pay_balance {
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
-  status         String?
+  status         String?          @default("pending")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
