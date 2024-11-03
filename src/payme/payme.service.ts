@@ -6,6 +6,7 @@ import { RequestBody } from './types/incoming-request-body';
 import { GetStatementDto } from './dto/get-statement.dto';
 import { CancelTransactionDto } from './dto/cancel-transaction.dto';
 import { PerformTransactionDto } from './dto/perform-transaction.dto';
+import { CheckTransactionDto } from './dto/check-transaction.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ErrorStatusCodes } from './constants/error-status-codes';
 import { PaymeError } from './constants/payme-error';
@@ -37,6 +38,8 @@ export class PaymeService {
         return await this.cancelTransaction(reqBody as CancelTransactionDto);
       case TransactionMethods.GetStatement:
         return await this.getStatement(reqBody as GetStatementDto);
+      case TransactionMethods.CheckTransaction: 
+        return await this.checkTransaction(reqBody as CheckTransactionDto);
       default:
         return { error: 'Invalid transaction method' };
     }
@@ -104,7 +107,7 @@ export class PaymeService {
     const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: userId },
     });
-    console.log("balance", balance);
+    // console.log("balance", balance);
     
 
     if (!balance || typeof balance.price !== 'number' || balance.price < amount / 100) {
@@ -115,11 +118,11 @@ export class PaymeService {
       where: {transaction_id : createTransactionDto.params.id}
     })
 
-    console.log(":l:", transid);
+    // console.log(":l:", transid);
     
     if (transid != null){
-      console.log("ifga kirdi");
-      console.log(transid.status)
+      // console.log("ifga kirdi");
+      // console.log(transid.status)
       
       if (transid.status !== 'pending') {        
         return {
@@ -136,8 +139,8 @@ export class PaymeService {
             state: TransactionState.PendingCanceled,
         }
         })
-        console.log("method", this.checkTransactionExpiration);
-        console.log(this.checkTransactionExpiration(transid.created_at));
+        // console.log("method", this.checkTransactionExpiration);
+        // console.log("method" , this.checkTransactionExpiration(transid.created_at));
         
         
         return {
@@ -170,9 +173,19 @@ export class PaymeService {
       },
   };
 
+  // try {
+  //   const checkResult = await this.checkPerformTransaction(checkTransaction);
+  //   console.log("Check Transaction Result:", checkResult);
+  // } catch (error) {
+  //   console.error("Error while checking transaction:", error);
+  // }
+
   const checkResult = await this.checkPerformTransaction(
       checkTransaction,
   );
+  // console.log("check", checkResult);
+  
+
 
   if (checkResult.error) {
       return {
@@ -191,6 +204,8 @@ export class PaymeService {
       updated_at: new Date(),
     },
   });
+  console.log("n", newTransaction);
+  
 
   return {
       result: {
@@ -201,6 +216,40 @@ export class PaymeService {
       },
   };
   }
+
+
+  async checkTransaction(checkTransactionDto: CheckTransactionDto) {
+    const transactionId = checkTransactionDto.params.id;
+  
+    const transaction = await this.prismaService.pay_balance.findUnique({
+      where: { id: Number(transactionId)},
+    });
+    console.log("checktrans", transaction);
+    
+  
+    if (!transaction) {
+      return {
+        error: {
+          code: 1008,
+          message: {
+            uz: "Tranzaksiya topilmadi",
+            en: "Transaction not found",
+            ru: "Транзакция не найдена",
+          },
+        },
+      };
+    }
+  
+    return {
+      result: {
+        transaction: transaction.transaction_id?.toString(),
+        create_time: transaction.created_at ? new Date(transaction.created_at).getTime() : null,
+        state: transaction.state,
+      },
+    };
+  }
+  
+
 
   async performTransaction(performTransactionDto: PerformTransactionDto) {
     const transaction = await this.prismaService.pay_balance.findUnique({
@@ -226,6 +275,8 @@ export class PaymeService {
     }
 
     const isExpired = this.checkTransactionExpiration(transaction.created_at);
+    console.log("mana", isExpired);
+    
 
     if (isExpired) {
       await this.prismaService.pay_balance.update({
