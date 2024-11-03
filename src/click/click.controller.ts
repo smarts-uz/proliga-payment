@@ -11,5 +11,3 @@ export class ClickController {
     return await this.clickService.handleMerchantTransactions(clickReqBody);
   }
 }
-// http://asdlfjdasf/click/shop-api
-

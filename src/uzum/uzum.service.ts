@@ -10,6 +10,7 @@ import { ConfirmTransactionDto } from './dto/confirm-transaction.dto';
 import { ReverseTransactionDto } from './dto/reverse-transaction.dto';
 import { CheckTransactionStatusDto } from './dto/check-status.dto';
 import { Decimal } from '@prisma/client/runtime/library';
+import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 
 
 @Injectable()
@@ -61,7 +62,7 @@ export class UzumService {
         transaction_id: transId,
         user_id: Number(createTransactionDto.params.userId),
         price:  Number(price),
-        system: 'uzum',
+        system: PAYMENTSYSTEM.UZUM,
         status: 'PENDING',
         created_at: new Date(),
         name: name

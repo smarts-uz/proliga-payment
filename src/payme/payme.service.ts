@@ -12,7 +12,7 @@ import { ErrorStatusCodes } from './constants/error-status-codes';
 import { PaymeError } from './constants/payme-error';
 import { DateTime } from 'luxon';
 import { TransactionState } from './constants/transaction-state';
-import { log } from 'node:console';
+import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 
 export const CancelingReasons = {
     CanceledDueToTimeout: 'Canceled due to timeout',
@@ -359,7 +359,7 @@ export class PaymeService {
           gte: new Date(getStatementDto.params.from),
           lte: new Date(getStatementDto.params.to),
         },
-        system: 'payme',
+        system: PAYMENTSYSTEM.PAYME,
       },
     });
 

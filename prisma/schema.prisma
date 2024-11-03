@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model action {
   id         Int              @id @default(autoincrement())
   position   player_position?
@@ -22,7 +21,6 @@ model action {
   name       String?          @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model banner {
   id          Int          @id(map: "advertisement_pkey") @default(autoincrement())
   start_date  DateTime     @db.Date
@@ -42,7 +40,6 @@ model banner {
   view_count  BigInt?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model banner_view {
   id         BigInt    @id @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -59,7 +56,6 @@ model banner_view {
   updated_by Int?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model card {
   id         Int       @id @default(autoincrement())
   player_id  Int?
@@ -74,7 +70,6 @@ model card {
   deleted_by Int?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model club {
   id               Int       @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
   name             String?   @db.VarChar(255)
@@ -97,7 +92,6 @@ model club {
   deleted_by       Int?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model company {
   id                    Int       @id @default(autoincrement())
   name                  String?   @db.VarChar(255)
@@ -124,7 +118,6 @@ model company {
   deleted_by            Int?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model competition {
   title              String    @db.VarChar(255)
   counter            String?   @db.VarChar(255)
@@ -148,7 +141,6 @@ model competition {
   deleted_by         Int?
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model country {
   id         Int       @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -162,7 +154,6 @@ model country {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model match {
   id               Int           @default(autoincrement())
   home_club_id     Int?
@@ -189,7 +180,6 @@ model match {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model news {
   id         Int       @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -207,30 +197,10 @@ model news {
   @@ignore
 }
 
-model users{
-  id             Int             @id @default(autoincrement())
-  name           String
-  lastname       String
-}
-
-model subscribtion {
-  id             Int             @id @default(autoincrement()) 
-  price          Float
-}
-
-model usersub { 
-  id             Int             @id @default(autoincrement())
-  user_id        Int?
-  subs_id        Int?
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_balance {
   id             Int             @id @default(autoincrement())
   name           String?         @db.VarChar(255)
   user_id        Int?
-  subs_id        Int?
   price          Int?
   system         pay_system_ext?
   transaction_id String?
@@ -246,11 +216,11 @@ model pay_balance {
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
-  status         String?          @default("pending")
+  status         String?         @default("pending")
+  subs_id        Int?
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_expense {
   id               Int               @default(autoincrement())
   name             String?           @db.VarChar(255)
@@ -280,7 +250,6 @@ model pay_expense {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_package {
   id         Int               @default(autoincrement())
   name_uz    String?           @db.VarChar(255)
@@ -300,7 +269,6 @@ model pay_package {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player {
   id                   Int              @default(autoincrement())
   name                 String?          @db.VarChar(255)
@@ -338,7 +306,6 @@ model player {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player_point {
   id                   Int       @default(autoincrement())
   player_id            Int?
@@ -373,7 +340,6 @@ model player_point {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player_result {
   id                   Int              @default(autoincrement())
   player_id            Int?
@@ -408,7 +374,6 @@ model player_result {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model prize {
   id             Int         @default(autoincrement())
   name           String?     @db.VarChar(255)
@@ -427,7 +392,6 @@ model prize {
   @@ignore
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model season {
   id         Int       @id(map: "_copy_1_copy_1") @default(autoincrement())
   number     Int?
@@ -441,8 +405,12 @@ model season {
   deleted_by Int?
 }
 
+model subscribtion {
+  id    Int   @id @default(autoincrement())
+  price Float
+}
+
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_config {
   id         BigInt       @default(autoincrement())
   key        config_key
@@ -462,7 +430,6 @@ model system_config {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_language {
   id         Int       @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -481,7 +448,6 @@ model system_language {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_notification {
   id           Int       @default(autoincrement())
   user_id      Int?
@@ -499,6 +465,18 @@ model system_notification {
   is_email     Boolean?  @default(false)
 
   @@ignore
+}
+
+model users {
+  id       Int    @id @default(autoincrement())
+  name     String
+  lastname String
+}
+
+model usersub {
+  id      Int  @id @default(autoincrement())
+  user_id Int?
+  subs_id Int?
 }
 
 enum System {
