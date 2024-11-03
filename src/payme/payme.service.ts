@@ -75,7 +75,6 @@ export class PaymeService {
     }
   
     const price = checkPerformTransactionDto.params.amount / 100;
-    // console.log(price);
     
   
     const balance = await this.prismaService.subscribtion.findUnique({
@@ -83,7 +82,6 @@ export class PaymeService {
     });
   
     if (!balance || typeof balance.price !== 'number' || balance.price < price) {
-      // console.log("ll", balance)
       return {
         error: {
           code: ErrorStatusCodes.TransactionNotAllowed,
@@ -107,7 +105,6 @@ export class PaymeService {
     const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: userId },
     });
-    // console.log("balance", balance);
     
 
     if (!balance || typeof balance.price !== 'number' || balance.price < amount / 100) {
@@ -118,11 +115,8 @@ export class PaymeService {
       where: {transaction_id : createTransactionDto.params.id}
     })
 
-    // console.log(":l:", transid);
     
     if (transid != null){
-      // console.log("ifga kirdi");
-      // console.log(transid.status)
       
       if (transid.status !== 'pending') {        
         return {
@@ -139,8 +133,6 @@ export class PaymeService {
             state: TransactionState.PendingCanceled,
         }
         })
-        // console.log("method", this.checkTransactionExpiration);
-        // console.log("method" , this.checkTransactionExpiration(transid.created_at));
         
         
         return {
@@ -173,17 +165,10 @@ export class PaymeService {
       },
   };
 
-  // try {
-  //   const checkResult = await this.checkPerformTransaction(checkTransaction);
-  //   console.log("Check Transaction Result:", checkResult);
-  // } catch (error) {
-  //   console.error("Error while checking transaction:", error);
-  // }
-
   const checkResult = await this.checkPerformTransaction(
       checkTransaction,
   );
-  // console.log("check", checkResult);
+  console.log(checkResult);
   
 
 
@@ -204,7 +189,7 @@ export class PaymeService {
       updated_at: new Date(),
     },
   });
-  console.log("n", newTransaction);
+  // console.log("n", newTransaction);
   
 
   return {
@@ -221,10 +206,10 @@ export class PaymeService {
   async checkTransaction(checkTransactionDto: CheckTransactionDto) {
     const transactionId = checkTransactionDto.params.id;
   
-    const transaction = await this.prismaService.pay_balance.findUnique({
-      where: { id: Number(transactionId)},
+    const transaction = await this.prismaService.pay_balance.findFirst({
+      where: { transaction_id: transactionId },
     });
-    console.log("checktrans", transaction);
+    // console.log("ggg!!!!!!!!!!!!!!!!!!!!!!!!!!!", transaction);
     
   
     if (!transaction) {
@@ -242,9 +227,16 @@ export class PaymeService {
   
     return {
       result: {
-        transaction: transaction.transaction_id?.toString(),
-        create_time: transaction.created_at ? new Date(transaction.created_at).getTime() : null,
+        // create_time : transaction.created_at ? new Date(transaction.created_at).getTime() : null,
+        // perform_time : transaction.created_at ? new Date(transaction.created_at).getTime() : null,
+        // cancel_time: 0,
+        // transaction : transaction.transaction_id,
+        // state: transaction.state,
+        // reason: null
+        balance : transaction.price,
+        transaction: transaction.transaction_id,
         state: transaction.state,
+        create_time: transaction.created_at ? new Date(transaction.created_at).getTime() : null,
       },
     };
   }
@@ -255,6 +247,7 @@ export class PaymeService {
     const transaction = await this.prismaService.pay_balance.findUnique({
       where: { id: Number(performTransactionDto.params.id) },
     });
+    
 
     if (!transaction) {
       return { error: PaymeError.TransactionNotFound, id: performTransactionDto.params.id };
