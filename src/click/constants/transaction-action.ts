@@ -1,5 +1,4 @@
 export const TransactionActions = {
-    Prepare: 0,
-    Complete: 1,
-  };
-  
+  Prepare: 0,
+  Complete: 1,
+};
