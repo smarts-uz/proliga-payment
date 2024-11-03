@@ -1,10 +1,10 @@
 export interface GenerateMd5HashParams {
-  clickTransId: string;
+  clickTransId: bigint;
   serviceId: number;
   secretKey: string;
   merchantTransId: string;
   merchantPrepareId?: number;
-  price: number;
+  amount: number;
   action: number;
   signTime: string;
 }

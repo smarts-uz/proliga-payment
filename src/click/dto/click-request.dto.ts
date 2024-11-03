@@ -1,13 +1,13 @@
 export class ClickRequestDto {
-  click_trans_id: number;
+  click_trans_id: bigint;
   service_id: number;
-  click_paydoc_id: number;
+  click_paydoc_id: bigint;
   merchant_user_id?: string;
   merchant_trans_id: string;
   user_id?: number;
-  price: number;
-  action: 0 | 1;
-  error: 0 | 1;
+  amount: number;
+  action: number;
+  error: number;
   error_note: string;
   sign_time: string;
   sign_string: string;

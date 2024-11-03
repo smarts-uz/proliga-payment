@@ -2,14 +2,16 @@ import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 import { ClickRequestDto } from '../dto/click-request.dto';
 import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.interface';
 import { ClickError } from 'src/enum/Payment.enum';
+import { TransactionStatus } from '../constants/status-codes';
 
 export async function prepare(this: any, clickReqBody: ClickRequestDto) {
+  const serviceId = Number(process.env.CLICK_SERVICE_ID);
+
   const merchantTransId = clickReqBody.merchant_trans_id;
   const userId = clickReqBody.user_id;
-  const price = clickReqBody.price;
-  const transId = clickReqBody.click_trans_id.toString();
+  const amount = clickReqBody.amount;
+  const transId: bigint = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const serviceId = clickReqBody.service_id;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
 
@@ -18,7 +20,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     secretKey: this.secretKey,
     merchantTransId,
     serviceId,
-    price,
+    amount,
     action,
     signTime,
   };
@@ -36,8 +38,6 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const isValidUserId = this.checkObjectId(userId);
 
-  console.log('valid user',isValidUserId)
-
   if (!isValidUserId) {
     return {
       error: ClickError.BadRequest,
@@ -47,7 +47,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
     where: {
-      transaction_id: transId,
+      transaction_id: transId.toString(),
       status: 'PAID',
     },
   });
@@ -88,11 +88,11 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const transaction = await this.prismaService.pay_balance.findUnique({
     where: {
-      id: Number(transId), // Convert transId to number if it's the unique identifier
+      id: Number(transId),
     },
   });
 
-  if (transaction && transaction.status === 'CANCELED') {
+  if (transaction && transaction.status === TransactionStatus.Canceled) {
     return {
       error: ClickError.TransactionCanceled,
       error_note: 'Transaction canceled',
@@ -105,16 +105,16 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     data: {
       user_id: Number(userId),
       transaction_id: transId,
-      status: 'PENDING',
+      status: TransactionStatus.Pending,
       system: PAYMENTSYSTEM.CLICK,
-      price: clickReqBody.price,
+      price: amount,
       created_at: time,
       updated_at: time,
     },
   });
 
   return {
-    click_trans_id: +transId,
+    click_trans_id: Number(transId),
     merchant_trans_id: merchantTransId,
     merchant_prepare_id: time,
     error: ClickError.Success,
