@@ -10,16 +10,17 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const merchantTransId = clickReqBody.merchant_trans_id;
   const userId = clickReqBody.user_id;
   const amount = clickReqBody.amount;
-  const transId: bigint = clickReqBody.click_trans_id;
+  const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const action = clickReqBody.action;
+  const action = 0;
   const signTime = clickReqBody.sign_time;
+  
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
     merchantTransId,
-    serviceId,
+    serviceId: this.serviceId,
     amount,
     action,
     signTime,
@@ -27,21 +28,16 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
 
-  console.log('md5Hash', myMD5Hash, 'sign_string', signString);
+  console.log('md5Hash', myMD5Hash, 'maybe', signString);
+  // console.log("transid", transId);
+  // console.log(merchantTransId);
+  // console.log("lalalalalal");
+  
 
   if (signString !== myMD5Hash) {
     return {
       error: ClickError.SignFailed,
       error_note: 'Invalid sign_string',
-    };
-  }
-
-  const isValidUserId = this.checkObjectId(userId);
-
-  if (!isValidUserId) {
-    return {
-      error: ClickError.BadRequest,
-      error_note: 'Invalid user_id, user_id must be number',
     };
   }
 
@@ -73,11 +69,13 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const user = await this.prismaService.pay_balance.findUnique({
+  const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
+  console.log("manashu", user);
+  
 
   if (!user) {
     return {

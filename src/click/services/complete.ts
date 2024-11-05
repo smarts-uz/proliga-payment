@@ -11,21 +11,26 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const action = clickReqBody.action;
+  const action = 1;
   const signTime = clickReqBody.sign_time;
+  console.log("ishladi");
+  
+  console.log(transId);
+  console.log(merchantTransId);
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
     merchantTransId,
-    serviceId,
+    serviceId: this.serviceId,
     amount,
     action,
     signTime,
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log('sign_string', myMD5Hash);
+  console.log('mayne', myMD5Hash);
+  
 
   if (signString !== myMD5Hash) {
     return {
@@ -43,11 +48,13 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const user = await this.prismaService.pay_balance.findUnique({
+  const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
+  console.log("mana problem");
+  
 
   if (!user) {
     return {

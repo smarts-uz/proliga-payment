@@ -189,7 +189,7 @@ export class PaymeService {
       updated_at: new Date(),
     },
   });
-  // console.log("n", newTransaction);
+  console.log("n", newTransaction);
   
 
   return {
@@ -204,15 +204,16 @@ export class PaymeService {
 
 
   async checkTransaction(checkTransactionDto: CheckTransactionDto) {
+    console.log('check ishladi');
     const transactionId = checkTransactionDto.params.id;
   
     const transaction = await this.prismaService.pay_balance.findFirst({
       where: { transaction_id: transactionId },
     });
-    // console.log("ggg!!!!!!!!!!!!!!!!!!!!!!!!!!!", transaction);
+    console.log("ggg!!!!!!!!!!!!!!!!!!!!!!!!!!!", transaction);
     
   
-    if (!transaction) {
+    if (!transaction || !transaction.transaction_id) {
       return {
         error: {
           code: 1008,
@@ -240,6 +241,8 @@ export class PaymeService {
       },
     };
   }
+  
+  
   
 
 
