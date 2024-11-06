@@ -392,6 +392,15 @@ model prize {
   @@ignore
 }
 
+model reports {
+  id       BigInt    @id @default(autoincrement())
+  links    String?   @unique(map: "uk_link") @db.VarChar(255)
+  count    Int?
+  all_time Float?
+  report   String?   @db.VarChar(255)
+  day      DateTime? @db.Date
+}
+
 model season {
   id         Int       @id(map: "_copy_1_copy_1") @default(autoincrement())
   number     Int?

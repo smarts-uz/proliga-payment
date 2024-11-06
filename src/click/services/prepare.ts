@@ -27,14 +27,12 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
 
-  console.log('md5Hash', myMD5Hash, 'sign_string', signString);
-
-  if (signString !== myMD5Hash) {
-    return {
-      error: ClickError.SignFailed,
-      error_note: 'Invalid sign_string',
-    };
-  }
+  // if (signString !== myMD5Hash) {
+  //   return {
+  //     error: ClickError.SignFailed,
+  //     error_note: 'Invalid sign_string',
+  //   };
+  // }
 
   const isValidUserId = this.checkObjectId(userId);
 
