@@ -25,12 +25,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  // if (signString !== myMD5Hash) {
-  //   return {
-  //     error: ClickError.SignFailed,
-  //     error_note: 'Invalid sign_string',
-  //   };
-  // }
 
   const isValidUserId = this.checkObjectId(userId);
 
@@ -59,7 +53,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       user_id: Number(userId),
     },
   });
-  console.log(amount, isPrepared.price);
 
   if (!isPrepared) {
     return {
@@ -81,13 +74,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Already paid',
     };
   }
-
-  // if (amount !== isPrepared.price) {
-  //   return {
-  //     error: ClickError.InvalidAmount,
-  //     error_note: 'Invalid price',
-  //   };
-  // }
 
   if (clickReqBody.error > 0) {
     await this.prismaService.pay_balance.update({
