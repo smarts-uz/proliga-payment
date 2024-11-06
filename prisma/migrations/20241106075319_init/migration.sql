@@ -290,7 +290,7 @@ CREATE TABLE "pay_balance" (
     "user_id" INTEGER,
     "price" INTEGER,
     "system" "pay_system_ext",
-    "transaction_id" INTEGER,
+    "transaction_id" TEXT,
     "currency_code" SMALLINT,
     "state" SMALLINT,
     "updated_time" TIMESTAMPTZ(6),
@@ -303,7 +303,8 @@ CREATE TABLE "pay_balance" (
     "created_by" INTEGER,
     "updated_by" INTEGER,
     "deleted_by" INTEGER,
-    "status" TEXT,
+    "status" TEXT DEFAULT 'pending',
+    "subs_id" INTEGER,
 
     CONSTRAINT "pay_balance_pkey" PRIMARY KEY ("id")
 );
@@ -485,6 +486,14 @@ CREATE TABLE "season" (
 );
 
 -- CreateTable
+CREATE TABLE "subscribtion" (
+    "id" SERIAL NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+
+    CONSTRAINT "subscribtion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "system_config" (
     "id" BIGSERIAL NOT NULL,
     "key" "config_key" NOT NULL,
@@ -533,4 +542,22 @@ CREATE TABLE "system_notification" (
     "is_broadcast" BOOLEAN DEFAULT false,
     "is_sms" BOOLEAN DEFAULT false,
     "is_email" BOOLEAN DEFAULT false
+);
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "lastname" TEXT NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "usersub" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER,
+    "subs_id" INTEGER,
+
+    CONSTRAINT "usersub_pkey" PRIMARY KEY ("id")
 );

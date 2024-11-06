@@ -15,18 +15,18 @@ import { TransactionState } from './constants/transaction-state';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 
 export const CancelingReasons = {
-    CanceledDueToTimeout: 'Canceled due to timeout',
+  CanceledDueToTimeout: 'Canceled due to timeout',
 };
 
 @Injectable()
 export class PaymeService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
     console.log("a", method);
-    
+
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformTransaction(reqBody as CheckPerformTransactionDto);
@@ -38,7 +38,7 @@ export class PaymeService {
         return await this.cancelTransaction(reqBody as CancelTransactionDto);
       case TransactionMethods.GetStatement:
         return await this.getStatement(reqBody as GetStatementDto);
-      case TransactionMethods.CheckTransaction: 
+      case TransactionMethods.CheckTransaction:
         return await this.checkTransaction(reqBody as CheckTransactionDto);
       default:
         return { error: 'Invalid transaction method' };
@@ -59,7 +59,7 @@ export class PaymeService {
         },
       };
     }
-  
+
     const parsedUserId = Number(userId);
     if (isNaN(parsedUserId)) {
       return {
@@ -73,14 +73,15 @@ export class PaymeService {
         },
       };
     }
-  
+
     const price = checkPerformTransactionDto.params.amount / 100;
-    
-  
+
+
     const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: parsedUserId },
     });
-  
+
+
     if (!balance || typeof balance.price !== 'number' || balance.price < price) {
       return {
         error: {
@@ -93,126 +94,130 @@ export class PaymeService {
         },
       };
     }
-  
+
     return { result: { allow: true } };
   }
-  
+
 
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const userId = Number(createTransactionDto.params?.account?.user_id);
     const amount = createTransactionDto.params.amount;
 
-    const balance = await this.prismaService.subscribtion.findUnique({
+    const subid = await this.prismaService.usersub.findUnique({
       where: { id: userId },
     });
-    
+
+    const balance = await this.prismaService.subscribtion.findFirst({
+      where: { id: subid.subs_id }
+    });
+    // console.log("subdan|", balance)
 
     if (!balance || typeof balance.price !== 'number' || balance.price < amount / 100) {
       return { error: PaymeError.InsufficientFunds };
     }
 
-    const transid = await this.prismaService.pay_balance.findFirst({
-      where: {transaction_id : createTransactionDto.params.id}
-    })
 
-    
-    if (transid != null){
+    const transId = await this.prismaService.pay_balance.findFirst({
+      where: { transaction_id: createTransactionDto.params.id }
+    })
+    // console.log(transId)
+
+    if (transId !== null && transId !== undefined) {
+      console.log('ifdaman');
       
-      if (transid.status !== 'pending') {        
+      if (transId.status !== 'pending') {
         return {
-            error: PaymeError.CantDoOperation,
-            id: transid.transaction_id,
+          error: PaymeError.CantDoOperation,
+          id: transId.transaction_id,
         };
-        }
-      if (this.checkTransactionExpiration(transid.created_at)) {
+      }
+      if (this.checkTransactionExpiration(transId.created_at)) {
         await this.prismaService.pay_balance.update({
-          where: {id : transid.id},
-          data :  {
+          where: { id: transId.id },
+          data: {
             status: 'canceled',
             canceled_at: new Date(),
             state: TransactionState.PendingCanceled,
-        }
+          }
         })
-        
-        
+
+
         return {
-            error: {
-                ...PaymeError.CantDoOperation,
-                state: TransactionState.PendingCanceled,
-                reason: CancelingReasons.CanceledDueToTimeout,
-            },
-            id: transid.transaction_id,
+          error: {
+            ...PaymeError.CantDoOperation,
+            state: TransactionState.PendingCanceled,
+            reason: CancelingReasons.CanceledDueToTimeout,
+          },
+          id: transId.transaction_id,
         };
-      }     
-    
+      }
+
       return {
         result: {
-            balance: transid.price,
-            transaction: transid.transaction_id,
-            state: TransactionState.Pending,
-            create_time: new Date(transid.created_at).getTime(),
+          balance: transId.price,
+          transaction: transId.transaction_id,
+          state: TransactionState.Pending,
+          create_time: new Date(transId.created_at).getTime(),
         },
-    };
+      };
     }
 
     const checkTransaction: CheckPerformTransactionDto = {
       method: TransactionMethods.CheckPerformTransaction,
       params: {
-          amount: balance.price * 100,
-          account: {
-            user_id : userId.toString(),
-          },
+        amount: balance.price * 100,
+        account: {
+          user_id: userId.toString(),
+        },
       },
-  };
+    };
 
-  const checkResult = await this.checkPerformTransaction(
+    const checkResult = await this.checkPerformTransaction(
       checkTransaction,
-  );
-  console.log(checkResult);
-  
+    );
+    // console.log(checkResult);
 
 
-  if (checkResult.error) {
+
+    if (checkResult.error) {
       return {
-          error: checkResult.error,
-          id: transid.transaction_id,
+        error: checkResult.error,
+        id: transId.transaction_id,
       };
-  }
+    }
 
-  const newTransaction = await this.prismaService.pay_balance.create({
-    data: {
-      user_id: userId,
-      price: balance.price - amount, // Deducting the amount from the user's current balance
-      transaction_id: createTransactionDto.params.id, // Assuming `transaction_id` is required
-      state: 1, // Or set it according to your business logic
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  });
-  console.log("n", newTransaction);
-  
-
-  return {
-      result: {
-          balance: newTransaction.price,
-          transaction: createTransactionDto.params.id,
-          state: TransactionState.Pending,
-          create_time: new Date(newTransaction.created_at).getTime(),
+    const newTransaction = await this.prismaService.pay_balance.create({
+      data: {
+        user_id: userId,
+        price: balance.price -amount,
+        transaction_id: createTransactionDto.params.id,
+        state: 1, 
+        created_at: new Date(),
+        updated_at: new Date()
       },
-  };
+    });
+    // console.log("n", newTransaction);
+
+
+    return {
+      result: {
+        balance: newTransaction.price,
+        transaction: createTransactionDto.params.id,
+        state: TransactionState.Pending,
+        create_time: new Date(newTransaction.created_at).getTime(),
+      },
+    };
   }
 
 
   async checkTransaction(checkTransactionDto: CheckTransactionDto) {
-    console.log('check ishladi');
     const transactionId = checkTransactionDto.params.id;
-  
+
     const transaction = await this.prismaService.pay_balance.findFirst({
       where: { transaction_id: transactionId },
     });
-    console.log("ggg!!!!!!!!!!!!!!!!!!!!!!!!!!!", transaction);
-    
-  
+    console.log("pp", transaction)
+
     if (!transaction || !transaction.transaction_id) {
       return {
         error: {
@@ -225,32 +230,42 @@ export class PaymeService {
         },
       };
     }
-  
+
+    if (transaction.status === 'paid') {
+      console.log('ids');
+      
+      return {
+        error: {
+          code: 1009,  // You can define a new code for 'paid' status, e.g. 1009
+          message: {
+            uz: "Tranzaksiya to'lov qilingan",
+            en: "Transaction has already been paid",
+            ru: "Транзакция уже оплачена",
+          },
+        },
+      };
+    }
+
     return {
       result: {
-        // create_time : transaction.created_at ? new Date(transaction.created_at).getTime() : null,
-        // perform_time : transaction.created_at ? new Date(transaction.created_at).getTime() : null,
-        // cancel_time: 0,
-        // transaction : transaction.transaction_id,
-        // state: transaction.state,
-        // reason: null
-        balance : transaction.price,
-        transaction: transaction.transaction_id,
+        create_time : transaction.created_at,
+        cancel_time: transaction.canceled_at,
+        transaction : transaction.transaction_id,
         state: transaction.state,
-        create_time: transaction.created_at ? new Date(transaction.created_at).getTime() : null,
+        reason: transaction.reason
       },
     };
   }
-  
-  
-  
+
+
+
 
 
   async performTransaction(performTransactionDto: PerformTransactionDto) {
     const transaction = await this.prismaService.pay_balance.findUnique({
       where: { id: Number(performTransactionDto.params.id) },
     });
-    
+
 
     if (!transaction) {
       return { error: PaymeError.TransactionNotFound, id: performTransactionDto.params.id };
@@ -271,8 +286,6 @@ export class PaymeService {
     }
 
     const isExpired = this.checkTransactionExpiration(transaction.created_at);
-    console.log("mana", isExpired);
-    
 
     if (isExpired) {
       await this.prismaService.pay_balance.update({
@@ -300,7 +313,7 @@ export class PaymeService {
     const updatedTransaction = await this.prismaService.pay_balance.update({
       where: { id: transaction.id },
       data: {
-        status: 'PAID', 
+        status: 'PAID',
         state: TransactionState.Paid,
         updated_at: performTime,
       },
@@ -388,13 +401,13 @@ export class PaymeService {
     const transactioncreated_at = new Date(created_at);
     const timeoutDuration = 1;
     const timeoutThreshold = DateTime.now()
-        .minus({
-            minutes: timeoutDuration,
-        })
-        .toJSDate();
+      .minus({
+        minutes: timeoutDuration,
+      })
+      .toJSDate();
 
     return transactioncreated_at < timeoutThreshold;
-}
+  }
   // private checkTransactionExpiration(createdAt: Date): boolean {
   //   const transactionCreatedAt = new Date(createdAt);
   //   const timeoutDuration = 720; // 12 hours
