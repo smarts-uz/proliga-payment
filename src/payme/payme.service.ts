@@ -49,8 +49,6 @@ export class PaymeService {
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
     const userId = checkPerformTransactionDto.params?.account?.user_id;
     const amount = checkPerformTransactionDto.params.amount;
-    console.log("check auth", userId);
-    
     
     if (!userId) {
       return {
@@ -80,12 +78,26 @@ export class PaymeService {
     }
 
     const price = checkPerformTransactionDto.params.amount / 100;
-
-
-    const balance = await this.prismaService.subscribtion.findUnique({
-      where: { id: parsedUserId, price: amount },
+    console.log('user', parsedUserId, 'price', price);
+  
+    const balance = await this.prismaService.subscribtion.findFirst({
+      where: { id: parsedUserId, price: amount},
     });
-    
+    console.log(balance);
+
+    if (balance == null){
+      return {
+        error: {
+          code: 1008,
+          message: {
+            uz: "Tranzaksiya topilmadi",
+            en: "Transaction not found",
+            ru: "Транзакция не найдена",
+          },
+        },
+      };
+    }
+
     if (!balance){
       return{
         error: {
@@ -98,6 +110,7 @@ export class PaymeService {
         },
       };
     }
+
     if (typeof balance.price !== 'number' || balance.price < price) {
       return {
         error: {
@@ -257,8 +270,20 @@ export class PaymeService {
     const transaction = await this.prismaService.pay_balance.findFirst({
       where: { transaction_id: transactionId },
     });
+    if (!transaction){
+      return {
+        error: {
+          code: ErrorStatusCodes.InvalidAuthorization,
+          message: {
+            uz: 'Noto‘g‘ri avtorizatsiya',        
+            en: 'Invalid authorization',            
+            ru: 'Неверная авторизация',
+          },
+        },
+      };
+    }
 
-    if (!transaction || !transaction.transaction_id) {
+    if (!transaction.transaction_id) {
       return {
         error: {
           code: 1008,
@@ -309,7 +334,7 @@ export class PaymeService {
     if (!transaction) {
       return {
         error: {
-          code: ErrorStatusCodes.TransactionNotFound,
+          code: ErrorStatusCodes.InvalidAuthorization,
           message: {
             uz: 'Transacsiya topilmadi',        
             en: 'Transaction not found ',            
@@ -386,7 +411,7 @@ export class PaymeService {
     });
 
     if (!transaction) {
-      return { id: transId, error: PaymeError.TransactionNotFound };
+      return { id: transId, error: PaymeError.InvalidAuthorization };
     }
 
     if (transaction.state === TransactionState.Pending) {
@@ -428,6 +453,19 @@ export class PaymeService {
         system: PAYMENTSYSTEM.PAYME,
       },
     });
+
+    if (!transactions || transactions.length === 0){
+      return {
+        error: {
+          code: ErrorStatusCodes.InvalidAuthorization,
+          message: {
+            uz: 'Noto‘g‘ri avtorizatsiya',        
+            en: 'Invalid authorization',            
+            ru: 'Неверная авторизация',
+          },
+        },
+      };
+    }
 
     return {
       result: {
