@@ -49,8 +49,24 @@ export class PaymeService {
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
     const userId = checkPerformTransactionDto.params?.account?.user_id;
     const amount = checkPerformTransactionDto.params.amount;
+    console.log("check auth", userId);
+    
     
     if (!userId) {
+      return {
+        error: {
+          code: ErrorStatusCodes.InvalidAuthorization,
+          message: {
+            uz: 'Noto‘g‘ri avtorizatsiya',        
+            en: 'Invalid authorization',            
+            ru: 'Неверная авторизация',
+          },
+        },
+      };
+    }
+
+    const parsedUserId = Number(userId);
+    if (userId === undefined) {
       return {
         error: {
           code: ErrorStatusCodes.MissingUserId,
@@ -58,20 +74,6 @@ export class PaymeService {
             uz: 'Foydalanuvchi identifikatori kiritilmagan',
             en: 'User ID is missing',
             ru: 'Идентификатор пользователя отсутствует',
-          },
-        },
-      };
-    }
-
-    const parsedUserId = Number(userId);
-    if (isNaN(parsedUserId)) {
-      return {
-        error: {
-          code: ErrorStatusCodes.InvalidUserId,
-          message: {
-            uz: 'Foydalanuvchi identifikatori noto‘g‘ri',
-            en: 'Invalid user ID',
-            ru: 'Неверный идентификатор пользователя',
           },
         },
       };
@@ -117,15 +119,14 @@ export class PaymeService {
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const userId = Number(createTransactionDto.params?.account?.user_id);
     const amount = createTransactionDto.params.amount;
-
     if (!userId) {
       return {
         error: {
-          code: ErrorStatusCodes.MissingUserId,
+          code: ErrorStatusCodes.InvalidAuthorization,
           message: {
-            uz: 'Foydalanuvchi identifikatori kiritilmagan',
-            en: 'User ID is missing',
-            ru: 'Идентификатор пользователя отсутствует',
+            uz: 'Noto‘g‘ri avtorizatsiya',        
+            en: 'Invalid authorization',            
+            ru: 'Неверная авторизация',
           },
         },
       };
@@ -301,13 +302,21 @@ export class PaymeService {
 
 
   async performTransaction(performTransactionDto: PerformTransactionDto) {
-    const transaction = await this.prismaService.pay_balance.findUnique({
-      where: { id: Number(performTransactionDto.params.id) },
+    const transaction = await this.prismaService.pay_balance.findFirst({
+      where: { transaction_id: performTransactionDto.params.id},
     });
 
-
     if (!transaction) {
-      return { error: PaymeError.TransactionNotFound, id: performTransactionDto.params.id };
+      return {
+        error: {
+          code: ErrorStatusCodes.TransactionNotFound,
+          message: {
+            uz: 'Transacsiya topilmadi',        
+            en: 'Transaction not found ',            
+            ru: 'Неверная transaction',
+          },
+        },
+      };
     }
 
     if (transaction.state !== TransactionState.Pending) {
@@ -369,9 +378,11 @@ export class PaymeService {
 
   async cancelTransaction(cancelTransactionDto: CancelTransactionDto) {
     const transId = cancelTransactionDto.params.id;
+    console.log("create trans", transId);
+    
 
-    const transaction = await this.prismaService.pay_balance.findUnique({
-      where: { id: Number(transId) },
+    const transaction = await this.prismaService.pay_balance.findFirst({
+      where: { transaction_id: transId},
     });
 
     if (!transaction) {

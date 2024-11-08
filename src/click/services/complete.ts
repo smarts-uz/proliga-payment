@@ -38,21 +38,23 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const isValidUserId = this.checkObjectId(userId);
+  // const isValidUserId = this.checkObjectId(userId);
+  // console.log(isValidUserId);
+  
 
-  if (!isValidUserId) {
-    return {
-      error: ClickError.BadRequest,
-      error_note: 'Invalid user_id, user_id must be number',
-    };
-  }
+  // if (!isValidUserId) {
+  //   return {
+  //     error: ClickError.BadRequest,
+  //     error_note: 'Invalid user_id, user_id must be number',
+  //   };
+  // }
 
   const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
-  console.log("mana problem");
+  console.log("mana problem", user);
   
 
   if (!user) {
@@ -67,6 +69,8 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       user_id: Number(userId),
     },
   });
+  console.log("isPrepared", isPrepared);
+  
 
   if (!isPrepared) {
     return {
@@ -77,10 +81,11 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
     where: {
-      transaction_id: transId,
+      transaction_id: transId.toString(),
       status: TransactionStatus.Paid,
     },
   });
+  
 
   if (isAlreadyPaid) {
     return {
@@ -88,6 +93,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Already paid',
     };
   }
+console.log("amount:", amount, "is=paid", isPrepared.price);
 
   if (amount !== isPrepared.price) {
     return {
