@@ -47,6 +47,10 @@ export class PaymeService {
 
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
     const userId = checkPerformTransactionDto.params?.account?.user_id;
+    const amount = checkPerformTransactionDto.params.amount;
+
+    console.log("summa", amount);
+    
     if (!userId) {
       return {
         error: {
@@ -78,11 +82,23 @@ export class PaymeService {
 
 
     const balance = await this.prismaService.subscribtion.findUnique({
-      where: { id: parsedUserId },
+      where: { id: parsedUserId, price: amount },
     });
-
-
-    if (!balance || typeof balance.price !== 'number' || balance.price < price) {
+    console.log("checkda balanse", balance);
+    
+    if (!balance){
+      return{
+        error: {
+          code: ErrorStatusCodes.InvalidAmount,
+          message:{
+            'ru': 'Неверная сумма',
+            'uz': 'Incorrect amount',
+            'en': 'Incorrect amount',
+          },
+        },
+      };
+    }
+    if (typeof balance.price !== 'number' || balance.price < price) {
       return {
         error: {
           code: ErrorStatusCodes.TransactionNotAllowed,
@@ -94,6 +110,7 @@ export class PaymeService {
         },
       };
     }
+    
 
     return { result: { allow: true } };
   }
@@ -106,13 +123,27 @@ export class PaymeService {
     const subid = await this.prismaService.usersub.findUnique({
       where: { id: userId },
     });
+    const sub_id = subid.subs_id
+
 
     const balance = await this.prismaService.subscribtion.findFirst({
-      where: { id: subid.subs_id }
+      where: { id: sub_id , price: amount}
     });
-    // console.log("subdan|", balance)
+    console.log("subdan|", balance)
+    if (!balance){
+      return{
+        error: {
+          code: ErrorStatusCodes.InvalidAmount,
+          message:{
+            'ru': 'Неверная сумма',
+            'uz': 'Incorrect amount',
+            'en': 'Incorrect amount',
+          },
+        },
+      };
+    }
 
-    if (!balance || typeof balance.price !== 'number' || balance.price < amount / 100) {
+    if (typeof balance.price !== 'number' || balance.price < amount / 100) {
       return { error: PaymeError.InsufficientFunds };
     }
 

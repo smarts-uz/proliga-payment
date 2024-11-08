@@ -11,12 +11,11 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const action = 1;
+  const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
   console.log("ishladi");
+  console.log(userId);
   
-  console.log(transId);
-  console.log(merchantTransId);
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,

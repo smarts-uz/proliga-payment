@@ -107,7 +107,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   await this.prismaService.pay_balance.create({
     data: {
       user_id: Number(userId),
-      transaction_id: transId,
+      transaction_id: transId.toString(),
       status: TransactionStatus.Pending,
       system: PAYMENTSYSTEM.CLICK,
       price: amount,
