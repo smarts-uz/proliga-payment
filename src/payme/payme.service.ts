@@ -196,7 +196,7 @@ export class PaymeService {
         updated_at: new Date()
       },
     });
-    // console.log("n", newTransaction);
+    console.log("n", newTransaction);
 
 
     return {
@@ -216,7 +216,6 @@ export class PaymeService {
     const transaction = await this.prismaService.pay_balance.findFirst({
       where: { transaction_id: transactionId },
     });
-    console.log("pp", transaction)
 
     if (!transaction || !transaction.transaction_id) {
       return {
@@ -232,11 +231,10 @@ export class PaymeService {
     }
 
     if (transaction.status === 'paid') {
-      console.log('ids');
       
       return {
         error: {
-          code: 1009,  // You can define a new code for 'paid' status, e.g. 1009
+          code: 1009,  
           message: {
             uz: "Tranzaksiya to'lov qilingan",
             en: "Transaction has already been paid",
@@ -249,9 +247,10 @@ export class PaymeService {
     return {
       result: {
         create_time : transaction.created_at,
-        cancel_time: transaction.canceled_at,
+        perform_time: transaction.perform_time,
+        cancel_time : transaction.canceled_at ? transaction.canceled_at.getTime() : 0,
         transaction : transaction.transaction_id,
-        state: transaction.state,
+        state: transaction.state !== null && transaction.state !== undefined ? transaction.state : 2,
         reason: transaction.reason
       },
     };
