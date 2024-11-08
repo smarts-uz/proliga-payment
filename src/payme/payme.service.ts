@@ -13,6 +13,7 @@ import { PaymeError } from './constants/payme-error';
 import { DateTime } from 'luxon';
 import { TransactionState } from './constants/transaction-state';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
+import { log } from 'node:console';
 
 export const CancelingReasons = {
   CanceledDueToTimeout: 'Canceled due to timeout',
@@ -48,8 +49,6 @@ export class PaymeService {
   async checkPerformTransaction(checkPerformTransactionDto: CheckPerformTransactionDto) {
     const userId = checkPerformTransactionDto.params?.account?.user_id;
     const amount = checkPerformTransactionDto.params.amount;
-
-    console.log("summa", amount);
     
     if (!userId) {
       return {
@@ -84,7 +83,6 @@ export class PaymeService {
     const balance = await this.prismaService.subscribtion.findUnique({
       where: { id: parsedUserId, price: amount },
     });
-    console.log("checkda balanse", balance);
     
     if (!balance){
       return{
@@ -120,16 +118,27 @@ export class PaymeService {
     const userId = Number(createTransactionDto.params?.account?.user_id);
     const amount = createTransactionDto.params.amount;
 
-    const subid = await this.prismaService.usersub.findUnique({
+    if (!userId) {
+      return {
+        error: {
+          code: ErrorStatusCodes.MissingUserId,
+          message: {
+            uz: 'Foydalanuvchi identifikatori kiritilmagan',
+            en: 'User ID is missing',
+            ru: 'Идентификатор пользователя отсутствует',
+          },
+        },
+      };
+    }
+
+    const subid = await this.prismaService.usersub.findFirst({
       where: { id: userId },
     });
     const sub_id = subid.subs_id
-
-
     const balance = await this.prismaService.subscribtion.findFirst({
       where: { id: sub_id , price: amount}
     });
-    console.log("subdan|", balance)
+
     if (!balance){
       return{
         error: {
