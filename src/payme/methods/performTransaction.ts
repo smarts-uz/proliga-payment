@@ -2,19 +2,26 @@ import { PerformTransactionDto } from '../dto/perform-transaction.dto';
 import { PaymeError } from '../constants/payme-error';
 import { TransactionState } from '../constants/transaction-state';
 import { CancelingReasons } from '../constants/canceling-reasons';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
 export async function performTransaction(
   this: any,
   performTransactionDto: PerformTransactionDto,
 ) {
-  const transaction = await this.prismaService.pay_balance.findUnique({
-    where: { id: Number(performTransactionDto.params.id) },
+  const transaction = await this.prismaService.pay_balance.findFirst({
+    where: { transaction_id: performTransactionDto.params.id },
   });
 
   if (!transaction) {
     return {
-      error: PaymeError.TransactionNotFound,
-      id: performTransactionDto.params.id,
+      error: {
+        code: ErrorStatusCodes.InvalidAuthorization,
+        message: {
+          uz: 'Transacsiya topilmadi',
+          en: 'Transaction not found ',
+          ru: 'Неверная transaction',
+        },
+      },
     };
   }
 

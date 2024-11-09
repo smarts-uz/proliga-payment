@@ -203,7 +203,7 @@ model pay_balance {
   user_id        Int?
   price          Int?
   system         pay_system_ext?
-  transaction_id String?
+  transaction_id String?         @unique(map: "transaction_id")
   currency_code  Int?            @db.SmallInt
   state          Int?            @db.SmallInt
   updated_time   DateTime?       @db.Timestamptz(6)
@@ -212,10 +212,6 @@ model pay_balance {
   updated_at     DateTime?       @default(now()) @db.Timestamptz(6)
   deleted_at     DateTime?       @db.Timestamptz(6)
   canceled_at    DateTime?       @db.Timestamptz(6)
-<<<<<<< HEAD
-  perform_time   DateTime?       @default(now()) @db.Timestamptz(6)
-=======
->>>>>>> 19690d5a3525f40d7cc8e56cf8c8854ed70e661d
   reason         Int?
   created_by     Int?
   updated_by     Int?

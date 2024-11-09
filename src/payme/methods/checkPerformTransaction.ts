@@ -9,7 +9,7 @@ export async function checkPerformTransaction(
   if (!userId) {
     return {
       error: {
-        code: ErrorStatusCodes.MissingUserId,
+        code: ErrorStatusCodes.InvalidAuthorization,
         message: {
           uz: 'Foydalanuvchi identifikatori kiritilmagan',
           en: 'User ID is missing',

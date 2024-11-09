@@ -1,6 +1,6 @@
 import { CancelTransactionDto } from '../dto/cancel-transaction.dto';
 import { TransactionState } from '../constants/transaction-state';
-import { PaymeError } from '../constants/payme-error';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
 export async function cancelTransaction(
   this: any,
@@ -9,11 +9,20 @@ export async function cancelTransaction(
   const transId = cancelTransactionDto.params.id;
 
   const transaction = await this.prismaService.pay_balance.findUnique({
-    where: { id: Number(transId) },
+    where: { transaction_id: transId },
   });
 
   if (!transaction) {
-    return { id: transId, error: PaymeError.TransactionNotFound };
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAuthorization,
+        message: {
+          uz: 'Transacsiya topilmadi',
+          en: 'Transaction not found ',
+          ru: 'Неверная transaction',
+        },
+      },
+    };
   }
 
   if (transaction.state === TransactionState.Pending) {

@@ -1,5 +1,6 @@
 import { GetStatementDto } from '../dto/get-statement.dto';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
 export async function getStatement(
   this: any,
@@ -14,6 +15,19 @@ export async function getStatement(
       system: PAYMENTSYSTEM.PAYME,
     },
   });
+
+  if (!transactions || transactions?.length <= 0) {
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAuthorization,
+        message: {
+          uz: 'Tranzaksiya topilmadi',
+          en: 'Transaction not found',
+          ru: 'Транзакция не найдена',
+        },
+      },
+    };
+  }
 
   return {
     result: {

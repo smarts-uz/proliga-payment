@@ -4,6 +4,7 @@ import { TransactionState } from '../constants/transaction-state';
 import { CancelingReasons } from '../payme.service';
 import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
 export async function createTransaction(
   this: any,
@@ -11,33 +12,60 @@ export async function createTransaction(
 ) {
   const userId = Number(createTransactionDto.params?.account?.user_id);
   const amount = createTransactionDto.params.amount;
+  if (!userId) {
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAuthorization,
+        message: {
+          uz: 'Noto‘g‘ri avtorizatsiya',
+          en: 'Invalid authorization',
+          ru: 'Неверная авторизация',
+        },
+      },
+    };
+  }
 
-  const balance = await this.prismaService.subscribtion.findUnique({
+  const subid = await this.prismaService.usersub.findFirst({
     where: { id: userId },
   });
 
-  if (
-    !balance ||
-    typeof balance.price !== 'number' ||
-    balance.price < amount / 100
-  ) {
+  const sub_id = subid.subs_id;
+
+  const balance = await this.prismaService.subscribtion.findFirst({
+    where: { id: sub_id, price: amount },
+  });
+
+  if (!balance) {
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAmount,
+        message: {
+          ru: 'Неверная сумма',
+          uz: 'Incorrect amount',
+          en: 'Incorrect amount',
+        },
+      },
+    };
+  }
+
+  if (typeof balance.price !== 'number' || balance.price < amount / 100) {
     return { error: PaymeError.InsufficientFunds };
   }
 
-  const transid = await this.prismaService.pay_balance.findFirst({
+  const transId = await this.prismaService.pay_balance.findFirst({
     where: { transaction_id: createTransactionDto.params.id },
   });
 
-  if (transid != null) {
-    if (transid.status !== 'pending') {
+  if (transId !== null && transId !== undefined) {
+    if (transId.status !== 'pending') {
       return {
         error: PaymeError.CantDoOperation,
-        id: transid.transaction_id,
+        id: transId.transaction_id,
       };
     }
-    if (this.checkTransactionExpiration(transid.created_at)) {
+    if (this.checkTransactionExpiration(transId.created_at)) {
       await this.prismaService.pay_balance.update({
-        where: { id: transid.id },
+        where: { id: transId.id },
         data: {
           status: 'canceled',
           canceled_at: new Date(),
@@ -51,16 +79,16 @@ export async function createTransaction(
           state: TransactionState.PendingCanceled,
           reason: CancelingReasons.CanceledDueToTimeout,
         },
-        id: transid.transaction_id,
+        id: transId.transaction_id,
       };
     }
 
     return {
       result: {
-        balance: transid.price,
-        transaction: transid.transaction_id,
+        balance: transId.price,
+        transaction: transId.transaction_id,
         state: TransactionState.Pending,
-        create_time: new Date(transid.created_at).getTime(),
+        create_time: new Date(transId.created_at).getTime(),
       },
     };
   }
@@ -80,14 +108,14 @@ export async function createTransaction(
   if (checkResult.error) {
     return {
       error: checkResult.error,
-      id: transid.transaction_id,
+      id: transId.transaction_id,
     };
   }
 
   const newTransaction = await this.prismaService.pay_balance.create({
     data: {
       user_id: userId,
-      price: balance.price - amount, // Deducting the amount from the user's current balance
+      price: balance.price - amount,
       transaction_id: createTransactionDto.params.id,
       state: 1,
       created_at: new Date(),

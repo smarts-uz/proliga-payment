@@ -1,3 +1,4 @@
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { CheckTransactionDto } from '../dto/check-transaction.dto';
 
 export async function checkTransaction(
@@ -13,7 +14,7 @@ export async function checkTransaction(
   if (!transaction) {
     return {
       error: {
-        code: 1008,
+        code: ErrorStatusCodes.InvalidAuthorization,
         message: {
           uz: 'Tranzaksiya topilmadi',
           en: 'Transaction not found',
