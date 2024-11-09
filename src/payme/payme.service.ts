@@ -144,11 +144,14 @@ export class PaymeService {
         },
       };
     }
-
+    console.log("user", userId);
+    
     const subid = await this.prismaService.usersub.findFirst({
       where: { id: userId },
     });
     const sub_id = subid.subs_id
+    console.log(sub_id);
+    
     const balance = await this.prismaService.subscribtion.findFirst({
       where: { id: sub_id , price: amount}
     });
