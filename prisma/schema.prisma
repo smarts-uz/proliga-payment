@@ -211,13 +211,14 @@ model pay_balance {
   created_at     DateTime?       @default(now()) @db.Timestamptz(6)
   updated_at     DateTime?       @default(now()) @db.Timestamptz(6)
   deleted_at     DateTime?       @db.Timestamptz(6)
-  canceled_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  canceled_at    DateTime?       @db.Timestamptz(6)
   reason         Int?
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
   status         String?         @default("pending")
   subs_id        Int?
+  perform_time   DateTime?       @default(now()) @db.Timestamptz(6)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -390,15 +391,6 @@ model prize {
   name_ru        String?     @db.VarChar(255)
 
   @@ignore
-}
-
-model reports {
-  id       BigInt    @id @default(autoincrement())
-  links    String?   @unique(map: "uk_link") @db.VarChar(255)
-  count    Int?
-  all_time Float?
-  report   String?   @db.VarChar(255)
-  day      DateTime? @db.Date
 }
 
 model season {
