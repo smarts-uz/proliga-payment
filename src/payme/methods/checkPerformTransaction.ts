@@ -23,7 +23,7 @@ export async function checkPerformTransaction(
   if (isNaN(parsedUserId)) {
     return {
       error: {
-        code: ErrorStatusCodes.InvalidUserId,
+        code: ErrorStatusCodes.MissingUserId,
         message: {
           uz: 'Foydalanuvchi identifikatori noto‘g‘ri',
           en: 'Invalid user ID',
