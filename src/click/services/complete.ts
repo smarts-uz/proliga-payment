@@ -13,12 +13,15 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
+  console.log("ishladi");
+  console.log(userId);
+  
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
     merchantTransId,
-    serviceId,
+    serviceId: this.serviceId,
     amount,
     action,
     signTime,
@@ -26,20 +29,31 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
 
-  const isValidUserId = this.checkObjectId(userId);
-
-  if (!isValidUserId) {
+  if (signString !== myMD5Hash) {
     return {
-      error: ClickError.BadRequest,
-      error_note: 'Invalid user_id, user_id must be number',
+      error: ClickError.SignFailed,
+      error_note: 'Invalid sign_string',
     };
   }
 
-  const user = await this.prismaService.pay_balance.findUnique({
+  // const isValidUserId = this.checkObjectId(userId);
+  // console.log(isValidUserId);
+  
+
+  // if (!isValidUserId) {
+  //   return {
+  //     error: ClickError.BadRequest,
+  //     error_note: 'Invalid user_id, user_id must be number',
+  //   };
+  // }
+
+  const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
+  console.log("mana problem", user);
+  
 
   if (!user) {
     return {
@@ -53,6 +67,8 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       user_id: Number(userId),
     },
   });
+  console.log("isPrepared", isPrepared);
+  
 
   if (!isPrepared) {
     return {
@@ -63,10 +79,11 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
     where: {
-      transaction_id: transId,
+      transaction_id: transId.toString(),
       status: TransactionStatus.Paid,
     },
   });
+  
 
   if (isAlreadyPaid) {
     return {
@@ -74,6 +91,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Already paid',
     };
   }
+console.log("amount:", amount, "is=paid", isPrepared.price);
 
   if (clickReqBody.error > 0) {
     await this.prismaService.pay_balance.update({

@@ -10,16 +10,21 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const merchantTransId = clickReqBody.merchant_trans_id;
   const userId = clickReqBody.user_id;
   const amount = clickReqBody.amount;
-  const transId: bigint = clickReqBody.click_trans_id;
+  const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const action = clickReqBody.action;
+  const action = 0;
   const signTime = clickReqBody.sign_time;
+
+  console.log("maybee", userId);
+  console.log(transId)
+  
+  
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
     merchantTransId,
-    serviceId,
+    serviceId: this.serviceId,
     amount,
     action,
     signTime,
@@ -27,6 +32,10 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
 
+  if (signString !== myMD5Hash) {
+    return {
+      error: ClickError.SignFailed,
+      error_note: 'Invalid sign_string',
   const isValidUserId = this.checkObjectId(userId);
 
   if (!isValidUserId) {
@@ -63,12 +72,15 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Cancelled',
     };
   }
-
-  const user = await this.prismaService.pay_balance.findUnique({
+  console.log('user izlashdan oldin', Number(userId));
+  
+  const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
+  console.log("manashu", user);
+  
 
   if (!user) {
     return {
@@ -95,7 +107,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   await this.prismaService.pay_balance.create({
     data: {
       user_id: Number(userId),
-      transaction_id: transId,
+      transaction_id: transId.toString(),
       status: TransactionStatus.Pending,
       system: PAYMENTSYSTEM.CLICK,
       price: amount,

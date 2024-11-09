@@ -7,6 +7,6 @@ export const ErrorStatusCodes = {
     OperationCannotBePerformed: -31008,
     OrderCompleted: -31007,
     MissingUserId: 1007, // Add this line for Missing User ID error
-    InvalidUserId: 1008, 
+    InvalidAuthorization: -32504,
   };
   
