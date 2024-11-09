@@ -28,8 +28,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log('mayne', myMD5Hash);
-  
 
   if (signString !== myMD5Hash) {
     return {
@@ -94,13 +92,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 console.log("amount:", amount, "is=paid", isPrepared.price);
-
-  if (amount !== isPrepared.price) {
-    return {
-      error: ClickError.InvalidAmount,
-      error_note: 'Invalid price',
-    };
-  }
 
   if (clickReqBody.error > 0) {
     await this.prismaService.pay_balance.update({
