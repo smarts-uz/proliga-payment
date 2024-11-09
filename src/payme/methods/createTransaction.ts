@@ -76,7 +76,6 @@ export async function createTransaction(
   };
 
   const checkResult = await this.checkPerformTransaction(checkTransaction);
-  console.log(checkResult);
 
   if (checkResult.error) {
     return {
@@ -89,8 +88,8 @@ export async function createTransaction(
     data: {
       user_id: userId,
       price: balance.price - amount, // Deducting the amount from the user's current balance
-      transaction_id: createTransactionDto.params.id, 
-      state: 1, 
+      transaction_id: createTransactionDto.params.id,
+      state: 1,
       created_at: new Date(),
       updated_at: new Date(),
     },

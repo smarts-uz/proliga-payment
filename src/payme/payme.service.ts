@@ -28,8 +28,6 @@ export class PaymeService {
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
-    console.log('a', method);
-
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformTransaction(

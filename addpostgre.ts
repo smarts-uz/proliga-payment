@@ -15,7 +15,6 @@ async function insertData() {
     try {
         // Connect to PostgreSQL
         await client.connect();
-        console.log("Connected to PostgreSQL");
 
         // 1. Insert data into the users table and get the inserted ids
         const userIds = [];
@@ -28,7 +27,6 @@ async function insertData() {
             const res = await client.query(insertUserQuery, [user.name, user.lastname]);
             const userId = res.rows[0].id;  // Getting the generated user id
             userIds.push(userId);  // Store user id for future use
-            console.log(`Inserted user: ${user.name}`);
         }
 
         // 2. Insert data into the subscribtion table and get the inserted ids
@@ -42,7 +40,6 @@ async function insertData() {
             const res = await client.query(insertSubscribtionQuery, [subscribtion.price]);
             const subscribtionId = res.rows[0].id;  // Getting the generated subscribtion id
             subscribtionIds.push(subscribtionId);  // Store subscribtion id for future use
-            // console.log(`Inserted subscribtion: ${subscribtion.subscription_type}`);
         }
 
         // 3. Insert data into the usersub table using the user_ids and subscribtion_ids
@@ -54,10 +51,8 @@ async function insertData() {
             const userId = userIds[subscriptionData.user_id - 1];  // Get user_id using the index (adjusting for zero-indexed arrays)
             const subscribtionId = subscribtionIds[subscriptionData.subscribtion_id - 1];  // Get subscribtion_id similarly
             await client.query(insertUsersubQuery, [userId, subscribtionId]);
-            console.log(`Inserted usersub record for user ID ${userId} and subscribtion ID ${subscribtionId}`);
         }
 
-        console.log("Data insertion completed!");
     } catch (error) {
         console.error("Error inserting data:", error);
     } finally {

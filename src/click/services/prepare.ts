@@ -15,11 +15,6 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const action = 0;
   const signTime = clickReqBody.sign_time;
 
-  console.log("maybee", userId);
-  console.log(transId)
-  
-  
-
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
@@ -36,6 +31,8 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     return {
       error: ClickError.SignFailed,
       error_note: 'Invalid sign_string',
+    };
+  }
   const isValidUserId = this.checkObjectId(userId);
 
   if (!isValidUserId) {
@@ -72,15 +69,12 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Cancelled',
     };
   }
-  console.log('user izlashdan oldin', Number(userId));
-  
+
   const user = await this.prismaService.users.findFirst({
     where: {
       id: Number(userId),
     },
   });
-  console.log("manashu", user);
-  
 
   if (!user) {
     return {
