@@ -23,10 +23,15 @@ export async function checkPerformTransaction(
     };
   }
 
-  const balance = await this.prismaService.subscribtion.findUnique({
-    where: { id: userId, price:price },
+  const uzer_id = await this.prismaService.subscribtion.findUnique({
+    where: { id: userId},
   });
-  if (!balance) {
+
+  const balance = await this.prismaService.subscribtion.findUnique({
+    where: { id: userId, price:price},
+  });
+
+  if (!uzer_id) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
@@ -34,6 +39,19 @@ export async function checkPerformTransaction(
           uz: "Transaction topilmadi",
           en: 'User balance does not exist',
           ru: 'Баланс пользователя не существует',
+        },
+      },
+    };
+  }
+
+  if (!balance){
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAmount,
+        message: {
+          ru: 'Неверная сумма',
+          uz: 'Incorrect amount',
+          en: 'Incorrect amount',
         },
       },
     };
