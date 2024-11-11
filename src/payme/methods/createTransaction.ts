@@ -5,6 +5,8 @@ import { CancelingReasons } from '../payme.service';
 import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { copyFileSync } from 'node:fs';
+
 
 export async function createTransaction(
   this: any,
@@ -96,7 +98,7 @@ export async function createTransaction(
   const checkTransaction: CheckPerformTransactionDto = {
     method: TransactionMethods.CheckPerformTransaction,
     params: {
-      amount: balance.price * 100,
+      amount: balance.price,
       account: {
         user_id: userId.toString(),
       },
@@ -108,14 +110,14 @@ export async function createTransaction(
   if (checkResult.error) {
     return {
       error: checkResult.error,
-      id: transId.transaction_id,
+      id: transId?.transaction_id, 
     };
   }
 
   const newTransaction = await this.prismaService.pay_balance.create({
     data: {
       user_id: userId,
-      price: balance.price - amount,
+      price: balance.price,
       transaction_id: createTransactionDto.params.id,
       state: 1,
       created_at: new Date(),
@@ -126,7 +128,7 @@ export async function createTransaction(
   return {
     result: {
       balance: newTransaction.price,
-      transaction: createTransactionDto.params.id,
+      transaction: newTransaction.transaction_id,
       state: TransactionState.Pending,
       create_time: new Date(newTransaction.created_at).getTime(),
     },

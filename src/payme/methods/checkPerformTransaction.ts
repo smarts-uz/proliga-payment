@@ -24,11 +24,8 @@ export async function checkPerformTransaction(
   }
 
   const balance = await this.prismaService.subscribtion.findUnique({
-    where: { id: userId },
+    where: { id: userId, price:price },
   });
-
-  console.log(balance, price);
-  console.log(userId);
   // wrong sum balance: null
   // wrong sum price: 100
   // wrong sum selected sum: 100

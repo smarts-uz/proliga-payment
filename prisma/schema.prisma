@@ -218,7 +218,7 @@ model pay_balance {
   deleted_by     Int?
   status         String?         @default("pending")
   subs_id        Int?
-  perform_time   DateTime?       @default(now()) @db.Timestamptz(6)
+  perform_time   DateTime?       @db.Timestamptz(6)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
