@@ -87,24 +87,24 @@ export async function createTransaction(
     };
   }
 
-  // const checkTransaction: CheckPerformTransactionDto = {
-  //   method: TransactionMethods.CheckPerformTransaction,
-  //   params: {
-  //     amount: balance.price,
-  //     account: {
-  //       user_id: userId.toString(),
-  //     },
-  //   },
-  // };
+  const checkTransaction: CheckPerformTransactionDto = {
+    method: TransactionMethods.CheckPerformTransaction,
+    params: {
+      amount: balance.price,
+      account: {
+        user_id: userId.toString(),
+      },
+    },
+  };
 
-  // const checkResult = await this.checkPerformTransaction(checkTransaction);
+  const checkResult = await this.checkPerformTransaction(checkTransaction);
 
-  // if (checkResult.error) {
-  //   return {
-  //     error: checkResult.error,
-  //     id: transId?.transaction_id, 
-  //   };
-  // }
+  if (checkResult.error) {
+    return {
+      error: checkResult.error,
+      id: transId?.transaction_id, 
+    };
+  }
 
   const newTransaction = await this.prismaService.pay_balance.create({
     data: {

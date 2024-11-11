@@ -28,7 +28,6 @@ export class PaymeService {
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
-console.log(method)
 
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
