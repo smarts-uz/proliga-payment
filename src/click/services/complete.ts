@@ -13,9 +13,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
-  console.log("ishladi");
-  console.log(userId);
-  
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
@@ -28,8 +25,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log('mayne', myMD5Hash);
-  
 
   if (signString !== myMD5Hash) {
     return {
@@ -39,8 +34,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   }
 
   // const isValidUserId = this.checkObjectId(userId);
-  // console.log(isValidUserId);
-  
 
   // if (!isValidUserId) {
   //   return {
@@ -54,8 +47,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       id: Number(userId),
     },
   });
-  console.log("mana problem", user);
-  
 
   if (!user) {
     return {
@@ -69,8 +60,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       user_id: Number(userId),
     },
   });
-  console.log("isPrepared", isPrepared);
-  
 
   if (!isPrepared) {
     return {
@@ -85,20 +74,11 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       status: TransactionStatus.Paid,
     },
   });
-  
 
   if (isAlreadyPaid) {
     return {
       error: ClickError.AlreadyPaid,
       error_note: 'Already paid',
-    };
-  }
-console.log("amount:", amount, "is=paid", isPrepared.price);
-
-  if (amount !== isPrepared.price) {
-    return {
-      error: ClickError.InvalidAmount,
-      error_note: 'Invalid price',
     };
   }
 
