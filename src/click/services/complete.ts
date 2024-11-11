@@ -25,6 +25,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
+  console.log(myMD5Hash)
 
   if (signString !== myMD5Hash) {
     return {
@@ -32,15 +33,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Invalid sign_string',
     };
   }
-
-  // const isValidUserId = this.checkObjectId(userId);
-
-  // if (!isValidUserId) {
-  //   return {
-  //     error: ClickError.BadRequest,
-  //     error_note: 'Invalid user_id, user_id must be number',
-  //   };
-  // }
 
   const user = await this.prismaService.users.findFirst({
     where: {

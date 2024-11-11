@@ -7,7 +7,7 @@ export async function checkTransaction(
 ) {
   const transactionId = checkTransactionDto.params.id;
 
-    const transaction = await this.prismaService.pay_balance.findFirst({
+    const transaction = await this.prismaService.pay_balance.findUnique({
       where: { transaction_id: transactionId },
     });
     if (!transaction){
