@@ -5,6 +5,9 @@ import { CancelingReasons } from '../payme.service';
 import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { copyFileSync } from 'node:fs';
+import { loadEnvFile } from 'node:process';
+
 
 export async function createTransaction(
   this: any,
@@ -28,9 +31,19 @@ export async function createTransaction(
   const subid = await this.prismaService.usersub.findFirst({
     where: { id: userId },
   });
-
+  if(!subid || !subid.subs_id){
+    return {
+      error: {
+        code: ErrorStatusCodes.TransactionNotAllowed,
+        message: {
+          uz: "Foydalanuvchi balansi yo'q",
+          en: 'User balance does not exist',
+          ru: 'Баланс пользователя не существует',
+        },
+      },
+    };
+  }
   const sub_id = subid.subs_id;
-
   const balance = await this.prismaService.subscribtion.findFirst({
     where: { id: sub_id, price: amount },
   });
@@ -52,37 +65,18 @@ export async function createTransaction(
     return { error: PaymeError.InsufficientFunds };
   }
 
-  const transId = await this.prismaService.pay_balance.findFirst({
+  const transId = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: createTransactionDto.params.id },
   });
+  console.log("transId", transId)
 
-  if (transId !== null && transId !== undefined) {
+  if (transId) {
     if (transId.status !== 'pending') {
       return {
         error: PaymeError.CantDoOperation,
         id: transId.transaction_id,
       };
     }
-    if (this.checkTransactionExpiration(transId.created_at)) {
-      await this.prismaService.pay_balance.update({
-        where: { id: transId.id },
-        data: {
-          status: 'canceled',
-          canceled_at: new Date(),
-          state: TransactionState.PendingCanceled,
-        },
-      });
-
-      return {
-        error: {
-          ...PaymeError.CantDoOperation,
-          state: TransactionState.PendingCanceled,
-          reason: CancelingReasons.CanceledDueToTimeout,
-        },
-        id: transId.transaction_id,
-      };
-    }
-
     return {
       result: {
         balance: transId.price,
@@ -93,29 +87,29 @@ export async function createTransaction(
     };
   }
 
-  const checkTransaction: CheckPerformTransactionDto = {
-    method: TransactionMethods.CheckPerformTransaction,
-    params: {
-      amount: balance.price * 100,
-      account: {
-        user_id: userId.toString(),
-      },
-    },
-  };
+  // const checkTransaction: CheckPerformTransactionDto = {
+  //   method: TransactionMethods.CheckPerformTransaction,
+  //   params: {
+  //     amount: balance.price,
+  //     account: {
+  //       user_id: userId.toString(),
+  //     },
+  //   },
+  // };
 
-  const checkResult = await this.checkPerformTransaction(checkTransaction);
+  // const checkResult = await this.checkPerformTransaction(checkTransaction);
 
-  if (checkResult.error) {
-    return {
-      error: checkResult.error,
-      id: transId.transaction_id,
-    };
-  }
+  // if (checkResult.error) {
+  //   return {
+  //     error: checkResult.error,
+  //     id: transId?.transaction_id, 
+  //   };
+  // }
 
   const newTransaction = await this.prismaService.pay_balance.create({
     data: {
       user_id: userId,
-      price: balance.price - amount,
+      price: balance.price,
       transaction_id: createTransactionDto.params.id,
       state: 1,
       created_at: new Date(),
@@ -126,7 +120,7 @@ export async function createTransaction(
   return {
     result: {
       balance: newTransaction.price,
-      transaction: createTransactionDto.params.id,
+      transaction: newTransaction.transaction_id,
       state: TransactionState.Pending,
       create_time: new Date(newTransaction.created_at).getTime(),
     },

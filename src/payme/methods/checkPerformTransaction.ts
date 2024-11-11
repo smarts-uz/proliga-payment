@@ -24,25 +24,14 @@ export async function checkPerformTransaction(
   }
 
   const balance = await this.prismaService.subscribtion.findUnique({
-    where: { id: userId },
+    where: { id: userId, price:price },
   });
-
-  console.log(balance, price);
-  console.log(userId);
-  // wrong sum balance: null
-  // wrong sum price: 100
-  // wrong sum selected sum: 100
-
-  // transaction does not exist balance: null
-  // transaction does not exist price: 102
-  // transaction does not selected sum: 100
-
   if (!balance) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
         message: {
-          uz: "Foydalanuvchi balansi yo'q",
+          uz: "Transaction topilmadi",
           en: 'User balance does not exist',
           ru: 'Баланс пользователя не существует',
         },
@@ -62,21 +51,6 @@ export async function checkPerformTransaction(
       },
     };
   }
-
-  // const parsedUserId = Number(userId);
-
-  // if (isNaN(parsedUserId)) {
-  //   return {
-  //     error: {
-  //       code: ErrorStatusCodes.MissingUserId,
-  //       message: {
-  //         uz: 'Foydalanuvchi identifikatori noto‘g‘ri',
-  //         en: 'Invalid user ID',
-  //         ru: 'Неверный идентификатор пользователя',
-  //       },
-  //     },
-  //   };
-  // }
 
   return { result: { allow: true } };
 }
