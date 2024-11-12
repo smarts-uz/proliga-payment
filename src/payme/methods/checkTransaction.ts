@@ -1,5 +1,6 @@
 import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { CheckTransactionDto } from '../dto/check-transaction.dto';
+import * as console from "node:console";
 
 export async function checkTransaction(
   this: any,
@@ -7,9 +8,10 @@ export async function checkTransaction(
 ) {
   const transactionId = checkTransactionDto.params.id;
 
-    const transaction = await this.prismaService.pay_balance.findUnique({
+    const transaction = await this.prismaService.pay_expense.findUnique({
       where: { transaction_id: transactionId },
     });
+    console.log(transaction)
     if (!transaction){
       return {
         error: {
@@ -53,7 +55,7 @@ export async function checkTransaction(
     return {
       result: {
         create_time: new Date(transaction.created_at).getTime(), 
-        perform_time: new Date(transaction.perform_time).getTime(), 
+        perform_time: transaction.perform_time ? new Date(transaction.perform_time).getTime() : 0,
         cancel_time: transaction.canceled_at ? new Date(transaction.canceled_at).getTime() : 0,
         transaction : transaction.transaction_id,
         state: transaction.state !== null && transaction.state !== undefined ? transaction.state : 2,

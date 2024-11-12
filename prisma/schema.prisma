@@ -268,10 +268,8 @@ model pay_balance {
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
-  status         String?        @default("pending")
-  perform_time   DateTime?      @db.Timestamptz(6)
-
-
+  status         String?         @default("pending")
+  perform_time   DateTime?       @db.Timestamptz(6)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -299,8 +297,7 @@ model pay_expense {
   state            Int?              @db.SmallInt
   updated_time     DateTime?         @db.Timestamptz(6)
   detail           String?           @db.VarChar(255)
-
-
+  perform_time     DateTime?         @db.Timestamptz(6)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -319,8 +316,6 @@ model pay_package {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-
-
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

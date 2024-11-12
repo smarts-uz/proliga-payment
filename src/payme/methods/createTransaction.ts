@@ -57,19 +57,11 @@ export async function createTransaction(
       },
     };
   }
-console.log("transIdd", createTransactionDto.params.id);
   const transId = await this.prismaService.pay_expense.findUnique({
     where: { transaction_id: createTransactionDto.params.id },
   });
 
   if (transId) {
-    console.log("ifdaman1")
-    if (transId.status !== 'pending') {
-      return {
-        error: PaymeError.CantDoOperation,
-        id: transId.transaction_id,
-      };
-    }
     return {
       result: {
         balance: transId.price,
@@ -91,10 +83,8 @@ console.log("transIdd", createTransactionDto.params.id);
   };
 
   const checkResult = await this.checkPerformTransaction(checkTransaction);
-  console.log(checkResult)
 
   if (checkResult.error) {
-    console.log("ifdaman")
     return {
       error: checkResult.error,
       id: transId?.transaction_id, 
