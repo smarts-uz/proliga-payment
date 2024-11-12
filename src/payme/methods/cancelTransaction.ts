@@ -7,7 +7,7 @@ export async function cancelTransaction(
   cancelTransactionDto: CancelTransactionDto,
 ) {
   const transId = cancelTransactionDto.params.id;
-
+  console.log("cenceldatrrans", transId);
   const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: transId },
   });

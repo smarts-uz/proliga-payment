@@ -16,6 +16,7 @@ import { checkTransaction } from './methods/checkTransaction';
 import { performTransaction } from './methods/performTransaction';
 import { cancelTransaction } from './methods/cancelTransaction';
 import { getStatement } from './methods/getStatement';
+import * as console from "node:console";
 
 export const CancelingReasons = {
   CanceledDueToTimeout: 'Canceled due to timeout',
@@ -28,7 +29,7 @@ export class PaymeService {
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
-
+  console.log(method)
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformTransaction(

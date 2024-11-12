@@ -5,7 +5,7 @@ CREATE TYPE "System" AS ENUM ('Payme', 'Click', 'Uzum');
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'CREATED', 'PAID', 'CANCELED');
 
 -- CreateEnum
-CREATE TYPE "banner_type" AS ENUM ('dynamic', 'static');
+CREATE TYPE "banner_type" AS ENUM ('modal_banner', 'mini_banner', 'big_banner', 'side_banner_right', 'side_banner_left');
 
 -- CreateEnum
 CREATE TYPE "config_key" AS ENUM ('config_image', 'config_images', 'config_file', 'config_files', 'config_enum', 'config_date', 'config_foreign_type', 'config_bool', 'config_string', 'config_int', 'pickPlayer_limit', 'craeteTeam_limit', 'user_balance', 'latest_player', 'sms_confirm_uz', 'sms_confirm_ru', 'useSmsConfirmation', 'isSmsTesting', 'smsTestingText', 'eskiz_token', 'MAILERSEND_API_TOKEN');
@@ -17,10 +17,13 @@ CREATE TYPE "config_type" AS ENUM ('TextField', 'Dropdown', 'Radio', 'Checkbox')
 CREATE TYPE "customer_type" AS ENUM ('good', 'core', 'bad');
 
 -- CreateEnum
-CREATE TYPE "forma" AS ENUM ('A', 'B', 'C', 'D', 'E', 'F');
+CREATE TYPE "forma" AS ENUM ('a3', 'a4', 'a5', 'a2', 'a1');
 
 -- CreateEnum
 CREATE TYPE "formas" AS ENUM ('f3_5_2', 'f3_4_3', 'f4_3_3', 'f5_3_2', 'f5_4_1', 'f4_4_2');
+
+-- CreateEnum
+CREATE TYPE "forms" AS ENUM ('f3_5_2', 'f3_4_3', 'f4_3_3', 'f5_3_2', 'f5_4_1', 'f4_4_2');
 
 -- CreateEnum
 CREATE TYPE "gender" AS ENUM ('male', 'female');
@@ -41,16 +44,16 @@ CREATE TYPE "pay_method" AS ENUM ('cash', 'terminal', 'paysys', 'bank');
 CREATE TYPE "pay_package_type" AS ENUM ('transfer_count', 'team_balance', 'single_club_count');
 
 -- CreateEnum
-CREATE TYPE "pay_system" AS ENUM ('click', 'payme', 'balance', 'uzum');
+CREATE TYPE "pay_system" AS ENUM ('click', 'payme', 'balance');
 
 -- CreateEnum
-CREATE TYPE "pay_system_ext" AS ENUM ('click', 'payme', 'uzum');
+CREATE TYPE "pay_system_ext" AS ENUM ('click', 'payme');
 
 -- CreateEnum
 CREATE TYPE "player_position" AS ENUM ('STR', 'MID', 'DEF', 'GOA', 'None');
 
 -- CreateEnum
-CREATE TYPE "point_action" AS ENUM ('is_lineup', 'is_lineup_more_60', 'goal', 'goal_asist', 'missed_penalty', 'every_2_missed_goals', 'red_card', 'yellow_card', 'is_shutout', 'autogoal', 'blocked_penalty');
+CREATE TYPE "point_action" AS ENUM ('is_lineup', 'is_lineup_more_60', 'goal', 'goal_asist', 'missed_penalty', 'every_2_missed_goals', 'red_card', 'yellow_card', 'is_shutout', 'blocked penalty', 'autogoal');
 
 -- CreateEnum
 CREATE TYPE "position" AS ENUM ('GOA', 'DEF', 'MID', 'STR');
@@ -98,7 +101,7 @@ CREATE TABLE "banner" (
     "price" INTEGER NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT false,
     "link" VARCHAR(255),
-    "content_url" VARCHAR(255),
+    "content_url" TEXT,
     "name" VARCHAR(255),
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
@@ -127,6 +130,7 @@ CREATE TABLE "banner_view" (
     "created_by" INTEGER,
     "deleted_by" INTEGER,
     "updated_by" INTEGER,
+    "browser" VARCHAR(255),
 
     CONSTRAINT "banner_view_pkey" PRIMARY KEY ("id")
 );
@@ -143,34 +147,29 @@ CREATE TABLE "card" (
     "deleted_at" TIMESTAMPTZ(6),
     "created_by" INTEGER,
     "updated_by" INTEGER,
-    "deleted_by" INTEGER,
-
-    CONSTRAINT "card_pkey" PRIMARY KEY ("id")
+    "deleted_by" INTEGER
 );
 
 -- CreateTable
 CREATE TABLE "club" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255),
-    "competition_name" VARCHAR(255),
-    "name_ru" VARCHAR(255),
-    "competition_id" INTEGER,
-    "club_link" VARCHAR(255),
+    "flag_url" VARCHAR(255),
     "country_id" INTEGER,
+    "name_ru" VARCHAR(255),
+    "club_link" VARCHAR(255),
     "native" VARCHAR(255),
     "form_img" VARCHAR(255),
     "slug" VARCHAR(255),
     "region" VARCHAR(255),
     "trainer" VARCHAR(255),
+    "competition_id" INTEGER,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMPTZ(6),
-    "logo_img" VARCHAR(255),
     "created_by" INTEGER,
     "updated_by" INTEGER,
-    "deleted_by" INTEGER,
-
-    CONSTRAINT "_copy_1_copy_1_copy_1_copy_1_copy_1" PRIMARY KEY ("id")
+    "deleted_by" INTEGER
 );
 
 -- CreateTable
@@ -244,6 +243,23 @@ CREATE TABLE "country" (
 );
 
 -- CreateTable
+CREATE TABLE "goal" (
+    "id" SERIAL NOT NULL,
+    "player_id" INTEGER,
+    "match_id" INTEGER,
+    "is_own_goal" SMALLINT,
+    "time" VARCHAR(10),
+    "is_penalty" SMALLINT,
+    "name" VARCHAR(255),
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
+);
+
+-- CreateTable
 CREATE TABLE "match" (
     "id" SERIAL NOT NULL,
     "home_club_id" INTEGER,
@@ -279,8 +295,7 @@ CREATE TABLE "news" (
     "deleted_at" TIMESTAMPTZ(6),
     "created_by" INTEGER,
     "updated_by" INTEGER,
-    "deleted_by" INTEGER,
-    "name_ru" VARCHAR(255)
+    "deleted_by" INTEGER
 );
 
 -- CreateTable
@@ -298,13 +313,11 @@ CREATE TABLE "pay_balance" (
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMPTZ(6),
-    "canceled_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "reason" INTEGER,
     "created_by" INTEGER,
     "updated_by" INTEGER,
     "deleted_by" INTEGER,
     "status" TEXT DEFAULT 'pending',
-    "subs_id" INTEGER,
+    "perform_time" TIMESTAMPTZ(6),
 
     CONSTRAINT "pay_balance_pkey" PRIMARY KEY ("id")
 );
@@ -328,12 +341,13 @@ CREATE TABLE "pay_expense" (
     "tour_id" INTEGER,
     "competition_id" INTEGER,
     "system" "pay_system",
-    "transaction_id" INTEGER,
+    "transaction_id" TEXT,
     "currency_code" SMALLINT,
     "state" SMALLINT,
     "updated_time" TIMESTAMPTZ(6),
     "detail" VARCHAR(255),
-    "season_id" INTEGER
+
+    CONSTRAINT "pay_expense_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -350,7 +364,9 @@ CREATE TABLE "pay_package" (
     "deleted_at" TIMESTAMPTZ(6),
     "created_by" INTEGER,
     "updated_by" INTEGER,
-    "deleted_by" INTEGER
+    "deleted_by" INTEGER,
+
+    CONSTRAINT "pay_package_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -375,17 +391,7 @@ CREATE TABLE "player" (
     "updated_by" INTEGER,
     "deleted_by" INTEGER,
     "team_count" INTEGER,
-    "percentage" INTEGER,
-    "is_actualized" BOOLEAN,
-    "played_min" SMALLINT DEFAULT 0,
-    "goal" SMALLINT DEFAULT 0,
-    "goal_asist" SMALLINT DEFAULT 0,
-    "missed_penalty" SMALLINT DEFAULT 0,
-    "every_2_missed_goals" SMALLINT DEFAULT 0,
-    "yellow_card" SMALLINT DEFAULT 0,
-    "blocked_penalty" INTEGER DEFAULT 0,
-    "autogoal" INTEGER DEFAULT 0,
-    "red_card" INTEGER DEFAULT 0
+    "percentage" INTEGER
 );
 
 -- CreateTable
@@ -416,8 +422,7 @@ CREATE TABLE "player_point" (
     "deleted_by" INTEGER,
     "season_id" INTEGER,
     "blocked_penalty" INTEGER DEFAULT 0,
-    "autogoal" INTEGER DEFAULT 0,
-    "match_name" VARCHAR(255)
+    "autogoal" INTEGER DEFAULT 0
 );
 
 -- CreateTable
@@ -448,8 +453,7 @@ CREATE TABLE "player_result" (
     "updated_by" INTEGER,
     "deleted_by" INTEGER,
     "blocked_penalty" INTEGER DEFAULT 0,
-    "autogoal" INTEGER DEFAULT 0,
-    "match_name" VARCHAR(255)
+    "autogoal" INTEGER DEFAULT 0
 );
 
 -- CreateTable
@@ -460,13 +464,7 @@ CREATE TABLE "prize" (
     "competition_id" INTEGER,
     "type" "prize_type",
     "order" SMALLINT,
-    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" TIMESTAMPTZ(6),
-    "created_by" INTEGER,
-    "deleted_by" INTEGER,
-    "updated_by" INTEGER,
-    "name_ru" VARCHAR(255)
+    "updated_by" INTEGER
 );
 
 -- CreateTable
@@ -486,14 +484,6 @@ CREATE TABLE "season" (
 );
 
 -- CreateTable
-CREATE TABLE "subscribtion" (
-    "id" SERIAL NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-
-    CONSTRAINT "subscribtion_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "system_config" (
     "id" BIGSERIAL NOT NULL,
     "key" "config_key" NOT NULL,
@@ -502,7 +492,7 @@ CREATE TABLE "system_config" (
     "is_list" BOOLEAN,
     "group" VARCHAR(255),
     "name" VARCHAR(255),
-    "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(6),
     "updated_at" TIMESTAMP(6),
     "deleted_at" TIMESTAMP(6),
     "created_by" INTEGER,
@@ -522,8 +512,7 @@ CREATE TABLE "system_language" (
     "deleted_at" TIMESTAMPTZ(6),
     "created_by" INTEGER,
     "updated_by" INTEGER,
-    "deleted_by" INTEGER,
-    "is_exclude" BOOLEAN
+    "deleted_by" INTEGER
 );
 
 -- CreateTable
@@ -533,7 +522,7 @@ CREATE TABLE "system_notification" (
     "desc" TEXT,
     "read_at" TIMESTAMPTZ(6),
     "name" VARCHAR(255),
-    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ(6),
     "updated_at" TIMESTAMPTZ(6),
     "deleted_at" TIMESTAMPTZ(6),
     "created_by" INTEGER,
@@ -545,19 +534,304 @@ CREATE TABLE "system_notification" (
 );
 
 -- CreateTable
-CREATE TABLE "users" (
+CREATE TABLE "system_table" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "lastname" TEXT NOT NULL,
-
-    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+    "name" VARCHAR(255),
+    "is_active" BOOLEAN,
+    "t_tables" "t_tables",
+    "field_hidden" JSONB,
+    "field_readonly" JSONB,
+    "role" "roles",
+    "deny_read" BOOLEAN,
+    "deny_edit" BOOLEAN,
+    "deny_create" BOOLEAN,
+    "deny_delete" BOOLEAN,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6),
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
 );
 
 -- CreateTable
-CREATE TABLE "usersub" (
+CREATE TABLE "team" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255),
+    "user_id" INTEGER,
+    "competition_id" INTEGER,
+    "formation" "forms" DEFAULT 'f4_3_3',
+    "DEF" SMALLINT,
+    "MID" SMALLINT,
+    "STR" SMALLINT,
+    "registered_tour_id" INTEGER,
+    "season_id" INTEGER,
+    "point" REAL DEFAULT 0,
+    "order" INTEGER DEFAULT 0,
+    "balance" REAL DEFAULT 100,
+    "is_team_created" BOOLEAN NOT NULL DEFAULT false,
+    "count_of_transfers" INTEGER DEFAULT 2,
+    "transfers_from_one_team" INTEGER DEFAULT 2,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER,
+    "last_tour_point" INTEGER DEFAULT 0,
+
+    CONSTRAINT "_copy_1_copy_1_copy_1_copy_1_copy_3" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "team_player" (
+    "id" SERIAL NOT NULL,
+    "player_id" INTEGER,
+    "order_number" SMALLINT,
+    "is_captain" BOOLEAN DEFAULT false,
+    "team_id" INTEGER,
+    "position" "player_position",
+    "club_id" INTEGER,
+    "point" INTEGER,
+    "name" VARCHAR(255),
+    "price" REAL,
+    "tour_id" INTEGER,
+    "competition_id" INTEGER,
+    "user_id" INTEGER,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
+);
+
+-- CreateTable
+CREATE TABLE "team_player_club" (
+    "id" BIGSERIAL NOT NULL,
+    "team_id" INTEGER,
+    "club_id" INTEGER,
+    "count" INTEGER,
+    "slug" VARCHAR,
+    "tour_id" INTEGER,
+    "competition_id" INTEGER,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER,
+    "name" VARCHAR(255)
+);
+
+-- CreateTable
+CREATE TABLE "tour" (
+    "id" SERIAL NOT NULL,
+    "season_id" INTEGER,
+    "name" VARCHAR(255),
+    "status" "tour_status",
+    "competition_id" INTEGER,
+    "datetime_start" TIMESTAMPTZ(6),
+    "order" INTEGER,
+    "datetime_end" TIMESTAMPTZ(0),
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
+);
+
+-- CreateTable
+CREATE TABLE "tour_team" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER,
-    "subs_id" INTEGER,
-
-    CONSTRAINT "usersub_pkey" PRIMARY KEY ("id")
+    "tour_id" INTEGER,
+    "purchased_players" SMALLINT,
+    "is_purchase_locked" BOOLEAN,
+    "team_id" INTEGER,
+    "price" REAL,
+    "point" REAL,
+    "competition_id" INTEGER,
+    "season_id" INTEGER,
+    "captain_id" INTEGER,
+    "current_count_of_transfers" INTEGER DEFAULT 0,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER,
+    "name" VARCHAR(255)
 );
+
+-- CreateTable
+CREATE TABLE "user" (
+    "id" SERIAL NOT NULL,
+    "guid" UUID,
+    "company_id" INTEGER,
+    "role" "roles" DEFAULT 'user',
+    "name" VARCHAR(255),
+    "email" VARCHAR(255) NOT NULL,
+    "phone" VARCHAR(255),
+    "is_active" BOOLEAN,
+    "photo" TEXT,
+    "is_super_admin" BOOLEAN,
+    "phone_second" VARCHAR(255),
+    "phone_telegram" VARCHAR(255),
+    "notes" TEXT,
+    "is_developer" BOOLEAN,
+    "telegram_user" VARCHAR(255),
+    "grid_resize" JSONB,
+    "grid_drag_drop" JSONB,
+    "is_notified" BOOLEAN,
+    "sms_code" VARCHAR(255),
+    "sms_created_at" TIMESTAMPTZ(6),
+    "last_name" TEXT,
+    "middle_name" TEXT,
+    "gender" TEXT,
+    "birth_date" DATE,
+    "bio" TEXT,
+    "balance" DOUBLE PRECISION DEFAULT 0,
+    "created_at" TIMESTAMPTZ(6),
+    "updated_at" TIMESTAMPTZ(6),
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER,
+    "language" "language" DEFAULT 'uz',
+    "enable_notification" BOOLEAN DEFAULT true,
+    "phone_verified" BOOLEAN DEFAULT false,
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_activity" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER,
+    "activity" "user_event",
+    "team_id" INTEGER,
+    "name_uz" TEXT,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER,
+    "name_ru" TEXT,
+    "name_en" TEXT,
+    "tour_id" INTEGER,
+    "competition_id" INTEGER,
+    "name" VARCHAR(255)
+);
+
+-- CreateTable
+CREATE TABLE "user_payment" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "in_amount" INTEGER,
+    "added_balance" INTEGER,
+    "currency" VARCHAR(10),
+    "name" VARCHAR(255),
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
+);
+
+-- CreateTable
+CREATE TABLE "user_player" (
+    "id" SERIAL NOT NULL,
+    "player_id" INTEGER,
+    "user_match_id" INTEGER,
+    "is_lineup_11" SMALLINT,
+    "played_min" SMALLINT,
+    "is_captain" BOOLEAN,
+    "name" VARCHAR(255),
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ(6),
+    "created_by" INTEGER,
+    "updated_by" INTEGER,
+    "deleted_by" INTEGER
+);
+
+-- CreateTable
+CREATE TABLE "user_prize" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255),
+    "competition_id" INTEGER,
+    "season_id" INTEGER,
+    "team_id" INTEGER,
+    "user_id" INTEGER,
+    "prize_id" INTEGER,
+    "team_point" INTEGER,
+    "prize_order" SMALLINT,
+    "updated_by" INTEGER
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "company_name_key" ON "company"("name");
+
+-- CreateIndex
+CREATE INDEX "name_company_copy1" ON "company"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "name_unique" ON "team"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_idx" ON "user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_phone_idx" ON "user"("phone");
+
+-- CreateIndex
+CREATE INDEX "name_user_copy1" ON "user"("name");
+
+-- AddForeignKey
+ALTER TABLE "banner_view" ADD CONSTRAINT "fk_banner_id" FOREIGN KEY ("banner_id") REFERENCES "banner"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "company" ADD CONSTRAINT "card_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "company" ADD CONSTRAINT "card_deleted_by_fkey" FOREIGN KEY ("deleted_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "company" ADD CONSTRAINT "card_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "competition" ADD CONSTRAINT "card_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "competition" ADD CONSTRAINT "card_deleted_by_fkey" FOREIGN KEY ("deleted_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "competition" ADD CONSTRAINT "card_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "competition" ADD CONSTRAINT "competition_country_id_fkey" FOREIGN KEY ("country_id") REFERENCES "country"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "country" ADD CONSTRAINT "country_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "country" ADD CONSTRAINT "country_deleted_by_fkey" FOREIGN KEY ("deleted_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "country" ADD CONSTRAINT "country_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "team" ADD CONSTRAINT "team_competition_id_fkey" FOREIGN KEY ("competition_id") REFERENCES "competition"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "team" ADD CONSTRAINT "team_season_id_fkey" FOREIGN KEY ("season_id") REFERENCES "season"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "team" ADD CONSTRAINT "team_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE SET NULL;
+
+-- AddForeignKey
+ALTER TABLE "user" ADD CONSTRAINT "user_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE SET NULL ON UPDATE SET NULL;

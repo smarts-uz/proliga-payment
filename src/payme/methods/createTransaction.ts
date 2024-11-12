@@ -7,6 +7,7 @@ import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { copyFileSync } from 'node:fs';
 import { loadEnvFile } from 'node:process';
+import * as console from "node:console";
 
 
 export async function createTransaction(
@@ -28,27 +29,23 @@ export async function createTransaction(
     };
   }
 
-  const subid = await this.prismaService.usersub.findFirst({
-    where: { id: userId },
+  const user = await this.prismaService.user.findUnique({
+    where: { id: userId},
   });
-  if(!subid || !subid.subs_id){
+  if (!user) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
         message: {
-          uz: "Foydalanuvchi balansi yo'q",
-          en: 'User balance does not exist',
-          ru: 'Баланс пользователя не существует',
+          uz: 'Noto‘g‘ri avtorizatsiya',
+          en: 'Invalid authorization',
+          ru: 'Неверная авторизация',
         },
       },
     };
   }
-  const sub_id = subid.subs_id;
-  const balance = await this.prismaService.subscribtion.findFirst({
-    where: { id: sub_id, price: amount },
-  });
 
-  if (!balance) {
+  if (amount < 1 || amount > 999999999){
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,
@@ -60,17 +57,13 @@ export async function createTransaction(
       },
     };
   }
-
-  if (typeof balance.price !== 'number' || balance.price < amount / 100) {
-    return { error: PaymeError.InsufficientFunds };
-  }
-
-  const transId = await this.prismaService.pay_balance.findUnique({
+console.log("transIdd", createTransactionDto.params.id);
+  const transId = await this.prismaService.pay_expense.findUnique({
     where: { transaction_id: createTransactionDto.params.id },
   });
-  console.log("transId", transId)
 
   if (transId) {
+    console.log("ifdaman1")
     if (transId.status !== 'pending') {
       return {
         error: PaymeError.CantDoOperation,
@@ -90,7 +83,7 @@ export async function createTransaction(
   const checkTransaction: CheckPerformTransactionDto = {
     method: TransactionMethods.CheckPerformTransaction,
     params: {
-      amount: balance.price,
+      amount: amount,
       account: {
         user_id: userId.toString(),
       },
@@ -98,18 +91,20 @@ export async function createTransaction(
   };
 
   const checkResult = await this.checkPerformTransaction(checkTransaction);
+  console.log(checkResult)
 
   if (checkResult.error) {
+    console.log("ifdaman")
     return {
       error: checkResult.error,
       id: transId?.transaction_id, 
     };
   }
 
-  const newTransaction = await this.prismaService.pay_balance.create({
+  const newTransaction = await this.prismaService.pay_expense.create({
     data: {
       user_id: userId,
-      price: balance.price,
+      price: amount,
       transaction_id: createTransactionDto.params.id,
       state: 1,
       created_at: new Date(),
