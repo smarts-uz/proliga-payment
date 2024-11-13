@@ -41,6 +41,23 @@ export async function checkPerformTransaction(
     };
   }
 
+  const pkg = await this.prismaService.pay_expense.findFirst({
+    where: {user_id: userId,  price: price},
+  });
+
+  if (!pkg) {
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAmount,
+        message: {
+          ru: 'Неверная сумма',
+          uz: 'Incorrect amount',
+          en: 'Incorrect amount',
+        },
+      },
+    };
+  }
+
   if (price < 1 || price > 999999999 ) {
     return {
       error: {

@@ -298,6 +298,7 @@ model pay_expense {
   updated_time     DateTime?         @db.Timestamptz(6)
   detail           String?           @db.VarChar(255)
   perform_time     DateTime?         @db.Timestamptz(6)
+  reason           String?           @db.VarChar(255)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
