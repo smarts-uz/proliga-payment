@@ -28,7 +28,6 @@ export class PaymeService {
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
-
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformTransaction(
@@ -55,9 +54,7 @@ export class PaymeService {
     return checkPerformTransaction.call(this, checkPerformTransactionDto);
   }
 
-  async createTransaction(
-    CreateTransactionDto: CreateTransactionDto,
-  ) {
+  async createTransaction(CreateTransactionDto: CreateTransactionDto) {
     return createTransaction.call(this, CreateTransactionDto);
   }
 

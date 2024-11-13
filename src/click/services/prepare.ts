@@ -26,8 +26,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash)
-  console.log(typeof userId)
+  console.log(myMD5Hash);
 
   if (signString !== myMD5Hash) {
     return {
@@ -99,15 +98,15 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   }
 
   const existingTransaction = await this.prismaService.pay_balance.findUnique({
-    where: { transaction_id: transId.toString() },
+    where: { transaction_id: transId?.toString() },
   });
-  
+
   if (existingTransaction) {
     return 'Transaction ID already exists.';
   }
-  
+
   const time = new Date();
-  
+
   await this.prismaService.pay_balance.create({
     data: {
       user_id: Number(userId),
@@ -119,7 +118,6 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       updated_at: time,
     },
   });
-  
 
   return {
     click_trans_id: Number(transId),

@@ -25,7 +25,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash)
+  console.log(myMD5Hash);
 
   if (signString !== myMD5Hash) {
     return {
@@ -62,7 +62,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
     where: {
-      transaction_id: transId.toString(),
+      transaction_id: transId?.toString(),
       status: TransactionStatus.Paid,
     },
   });

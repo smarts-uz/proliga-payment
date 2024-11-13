@@ -1,13 +1,9 @@
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { PaymeError } from '../constants/payme-error';
 import { TransactionState } from '../constants/transaction-state';
-import { CancelingReasons } from '../payme.service';
 import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
-import { copyFileSync } from 'node:fs';
-import { loadEnvFile } from 'node:process';
-
 
 export async function createTransaction(
   this: any,
@@ -31,7 +27,7 @@ export async function createTransaction(
   const subid = await this.prismaService.usersub.findFirst({
     where: { id: userId },
   });
-  if(!subid || !subid.subs_id){
+  if (!subid || !subid.subs_id) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
@@ -68,7 +64,7 @@ export async function createTransaction(
   const transId = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: createTransactionDto.params.id },
   });
-  console.log("transId", transId)
+  console.log('transId', transId);
 
   if (transId) {
     if (transId.status !== 'pending') {
@@ -92,7 +88,7 @@ export async function createTransaction(
     params: {
       amount: balance.price,
       account: {
-        user_id: userId.toString(),
+        user_id: userId?.toString(),
       },
     },
   };
@@ -102,7 +98,7 @@ export async function createTransaction(
   if (checkResult.error) {
     return {
       error: checkResult.error,
-      id: transId?.transaction_id, 
+      id: transId?.transaction_id,
     };
   }
 
