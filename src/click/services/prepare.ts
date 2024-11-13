@@ -87,6 +87,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const existingTransaction = await this.prismaService.pay_balance.findUnique({
     where: {
       transaction_id: transId.toString(),
+      user_id: Number(userId),
     },
   });
 
