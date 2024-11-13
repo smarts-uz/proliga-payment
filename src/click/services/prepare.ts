@@ -60,7 +60,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const isCancelled = await this.prismaService.pay_balance.findFirst({
     where: {
       user_id: Number(userId),
-      status: 'CANCELED',
+      status: TransactionStatus.Canceled,
     },
   });
 
@@ -84,27 +84,24 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const transaction = await this.prismaService.pay_balance.findUnique({
+  const existingTransaction = await this.prismaService.pay_balance.findUnique({
     where: {
-      id: Number(transId),
+      transaction_id: transId.toString(),
     },
   });
 
-  if (transaction && transaction.status === TransactionStatus.Canceled) {
+  if (
+    existingTransaction &&
+    existingTransaction.status === TransactionStatus.Canceled
+  ) {
     return {
       error: ClickError.TransactionCanceled,
       error_note: 'Transaction canceled',
     };
   }
-
-  const existingTransaction = await this.prismaService.pay_balance.findUnique({
-    where: { transaction_id: transId?.toString() },
-  });
-
   if (existingTransaction) {
     return 'Transaction ID already exists.';
   }
-
   const time = new Date();
 
   await this.prismaService.pay_balance.create({
