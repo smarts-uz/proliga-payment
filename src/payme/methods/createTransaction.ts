@@ -61,7 +61,7 @@ export async function createTransaction(
     return { error: PaymeError.InsufficientFunds };
   }
 
-  const transId = await this.prismaService.pay_balance.findUnique({
+  const transId = await this.prismaService.pay_balance.findFirst({
     where: { transaction_id: createTransactionDto.params.id },
   });
   console.log('transId', transId);

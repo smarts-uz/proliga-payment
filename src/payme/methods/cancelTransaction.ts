@@ -8,7 +8,7 @@ export async function cancelTransaction(
 ) {
   const transId = cancelTransactionDto.params.id;
 
-  const transaction = await this.prismaService.pay_balance.findUnique({
+  const transaction = await this.prismaService.pay_balance.findFirst({
     where: { transaction_id: transId },
   });
 
