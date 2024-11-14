@@ -62,7 +62,7 @@ export class UzumService {
         transaction_id: transId,
         user_id: Number(createTransactionDto.params.userId),
         price:  Number(price),
-        system: PAYMENTSYSTEM.UZUM,
+        // system: "uzum",
         status: 'PENDING',
         created_at: new Date(),
         name: name

@@ -22,22 +22,23 @@ model action {
 }
 
 model banner {
-  id          Int          @id(map: "advertisement_pkey") @default(autoincrement())
-  start_date  DateTime     @db.Date
-  end_date    DateTime     @db.Date
+  id          Int           @id(map: "advertisement_pkey") @default(autoincrement())
+  start_date  DateTime      @db.Date
+  end_date    DateTime      @db.Date
   price       Int
-  is_active   Boolean      @default(false)
-  link        String?      @db.VarChar(255)
-  content_url String?      @db.VarChar(255)
-  name        String?      @db.VarChar(255)
-  created_at  DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?    @default(now()) @db.Timestamptz(6)
-  deleted_at  DateTime?    @db.Timestamptz(6)
+  is_active   Boolean       @default(false)
+  link        String?       @db.VarChar(255)
+  content_url String?
+  name        String?       @db.VarChar(255)
+  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime?     @db.Timestamptz(6)
   created_by  Int?
   deleted_by  Int?
   updated_by  Int?
   banner_type banner_type?
   view_count  BigInt?
+  banner_view banner_view[]
 }
 
 model banner_view {
@@ -54,10 +55,13 @@ model banner_view {
   created_by Int?
   deleted_by Int?
   updated_by Int?
+  browser    String?   @db.VarChar(255)
+  banner     banner    @relation(fields: [banner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_banner_id")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model card {
-  id         Int       @id @default(autoincrement())
+  id         Int       @default(autoincrement())
   player_id  Int?
   card_type  String?   @db.VarChar(10)
   match_id   Int?
@@ -68,89 +72,108 @@ model card {
   created_by Int?
   updated_by Int?
   deleted_by Int?
+
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model club {
-  id               Int       @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
-  name             String?   @db.VarChar(255)
-  competition_name String?   @db.VarChar(255)
-  name_ru          String?   @db.VarChar(255)
-  competition_id   Int?
-  club_link        String?   @db.VarChar(255)
-  country_id       Int?
-  native           String?   @db.VarChar(255)
-  form_img         String?   @db.VarChar(255)
-  slug             String?   @db.VarChar(255)
-  region           String?   @db.VarChar(255)
-  trainer          String?   @db.VarChar(255)
-  created_at       DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at       DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at       DateTime? @db.Timestamptz(6)
-  logo_img         String?   @db.VarChar(255)
-  created_by       Int?
-  updated_by       Int?
-  deleted_by       Int?
+  id             Int       @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  flag_url       String?   @db.VarChar(255)
+  country_id     Int?
+  name_ru        String?   @db.VarChar(255)
+  club_link      String?   @db.VarChar(255)
+  native         String?   @db.VarChar(255)
+  form_img       String?   @db.VarChar(255)
+  slug           String?   @db.VarChar(255)
+  region         String?   @db.VarChar(255)
+  trainer        String?   @db.VarChar(255)
+  competition_id Int?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime? @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+
+  @@ignore
 }
 
 model company {
-  id                    Int       @id @default(autoincrement())
-  name                  String?   @db.VarChar(255)
-  location              String?
-  address               String?
-  inn                   String?   @db.VarChar(255)
-  mfo                   String?   @db.VarChar(255)
-  rs                    String?   @db.VarChar(255)
-  logo                  String?   @db.VarChar(255)
-  phone                 String?   @db.VarChar(255)
-  website               String?   @db.VarChar(255)
-  founded               DateTime? @db.Timestamptz(0)
-  expiration_time       DateTime? @db.Timestamptz(6)
-  last_notified         DateTime? @db.Timestamptz(0)
-  telegram_notification Boolean?
-  email_notification    Boolean?
-  sms_notification      Boolean?
-  notification_date     Int?
-  created_at            DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at            DateTime? @db.Timestamptz(6)
-  created_by            Int?
-  updated_by            Int?
-  deleted_by            Int?
+  id                            Int       @id @default(autoincrement())
+  name                          String?   @unique @db.VarChar(255)
+  location                      String?
+  address                       String?
+  inn                           String?   @db.VarChar(255)
+  mfo                           String?   @db.VarChar(255)
+  rs                            String?   @db.VarChar(255)
+  logo                          String?   @db.VarChar(255)
+  phone                         String?   @db.VarChar(255)
+  website                       String?   @db.VarChar(255)
+  founded                       DateTime? @db.Timestamptz(0)
+  expiration_time               DateTime? @db.Timestamptz(6)
+  last_notified                 DateTime? @db.Timestamptz(0)
+  telegram_notification         Boolean?
+  email_notification            Boolean?
+  sms_notification              Boolean?
+  notification_date             Int?
+  created_at                    DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at                    DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at                    DateTime? @db.Timestamptz(6)
+  created_by                    Int?
+  updated_by                    Int?
+  deleted_by                    Int?
+  user_company_created_byTouser user?     @relation("company_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull, map: "card_created_by_fkey")
+  user_company_deleted_byTouser user?     @relation("company_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull, map: "card_deleted_by_fkey")
+  user_company_updated_byTouser user?     @relation("company_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull, map: "card_updated_by_fkey")
+  user_user_company_idTocompany user[]    @relation("user_company_idTocompany")
+
+  @@index([name], map: "name_company_copy1")
 }
 
 model competition {
-  title              String    @db.VarChar(255)
-  counter            String?   @db.VarChar(255)
-  country_id         Int?
-  flag               String?   @db.VarChar(255)
-  id                 Int       @id(map: "_copy_2") @default(autoincrement())
-  name               String?   @db.VarChar(255)
-  name_ru            String?   @db.VarChar(255)
-  slug               String?   @db.VarChar(255)
-  competition_link   String?   @db.VarChar(255)
-  can_register       Boolean?
-  team_count         Int?
-  average_team_point Float?    @db.Real
-  sum_of_team_point  Int?
-  deadline           DateTime? @db.Timestamptz(6)
-  created_at         DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at         DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at         DateTime? @db.Timestamptz(6)
-  created_by         Int?
-  updated_by         Int?
-  deleted_by         Int?
+  title                             String    @db.VarChar(255)
+  counter                           String?   @db.VarChar(255)
+  country_id                        Int?
+  flag                              String?   @db.VarChar(255)
+  id                                Int       @id(map: "_copy_2") @default(autoincrement())
+  name                              String?   @db.VarChar(255)
+  name_ru                           String?   @db.VarChar(255)
+  slug                              String?   @db.VarChar(255)
+  competition_link                  String?   @db.VarChar(255)
+  can_register                      Boolean?
+  team_count                        Int?
+  average_team_point                Float?    @db.Real
+  sum_of_team_point                 Int?
+  deadline                          DateTime? @db.Timestamptz(6)
+  created_at                        DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at                        DateTime? @db.Timestamptz(6)
+  created_by                        Int?
+  updated_by                        Int?
+  deleted_by                        Int?
+  user_competition_created_byTouser user?     @relation("competition_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull, map: "card_created_by_fkey")
+  user_competition_deleted_byTouser user?     @relation("competition_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull, map: "card_deleted_by_fkey")
+  user_competition_updated_byTouser user?     @relation("competition_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull, map: "card_updated_by_fkey")
+  country                           country?  @relation(fields: [country_id], references: [id], onUpdate: SetNull)
+  team                              team[]
 }
 
 model country {
-  id         Int       @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
-  name       String?   @db.VarChar(255)
-  flag_url   String?   @db.VarChar(255)
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at DateTime? @default(now()) @db.Timestamptz(6)
-  deleted_at DateTime? @db.Timestamptz(6)
-  created_by Int?
-  updated_by Int?
-  deleted_by Int?
+  id                            Int           @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
+  name                          String?       @db.VarChar(255)
+  flag_url                      String?       @db.VarChar(255)
+  created_at                    DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at                    DateTime?     @default(now()) @db.Timestamptz(6)
+  deleted_at                    DateTime?     @db.Timestamptz(6)
+  created_by                    Int?
+  updated_by                    Int?
+  deleted_by                    Int?
+  competition                   competition[]
+  user_country_created_byTouser user?         @relation("country_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull)
+  user_country_deleted_byTouser user?         @relation("country_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull)
+  user_country_updated_byTouser user?         @relation("country_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -192,7 +215,6 @@ model news {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-  name_ru    String?   @db.VarChar(255)
 
   @@ignore
 }
@@ -203,7 +225,7 @@ model pay_balance {
   user_id        Int?
   price          Int?
   system         pay_system_ext?
-  transaction_id String?         @unique(map: "transaction_id")
+  transaction_id String?         @unique
   currency_code  Int?            @db.SmallInt
   state          Int?            @db.SmallInt
   updated_time   DateTime?       @db.Timestamptz(6)
@@ -211,19 +233,17 @@ model pay_balance {
   created_at     DateTime?       @default(now()) @db.Timestamptz(6)
   updated_at     DateTime?       @default(now()) @db.Timestamptz(6)
   deleted_at     DateTime?       @db.Timestamptz(6)
-  canceled_at    DateTime?       @db.Timestamptz(6)
-  reason         Int?
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
   status         String?         @default("pending")
-  subs_id        Int?
   perform_time   DateTime?       @db.Timestamptz(6)
+  reason         String?         @db.VarChar(255)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model pay_expense {
-  id               Int               @default(autoincrement())
+  id               Int               @id @default(autoincrement())
   name             String?           @db.VarChar(255)
   pay_package_id   Int?
   price            Int?
@@ -240,19 +260,20 @@ model pay_expense {
   tour_id          Int?
   competition_id   Int?
   system           pay_system?
-  transaction_id   Int?
+  transaction_id   String?           @unique
   currency_code    Int?              @db.SmallInt
   state            Int?              @db.SmallInt
   updated_time     DateTime?         @db.Timestamptz(6)
   detail           String?           @db.VarChar(255)
-  season_id        Int?
+  perform_time     DateTime?         @db.Timestamptz(6)
+  reason           String?           @db.VarChar(255)
 
   @@ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model pay_package {
-  id         Int               @default(autoincrement())
+  id         Int               @id @default(autoincrement())
   name_uz    String?           @db.VarChar(255)
   type       pay_package_type?
   amount     Float?            @db.Real
@@ -271,37 +292,27 @@ model pay_package {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model player {
-  id                   Int              @default(autoincrement())
-  name                 String?          @db.VarChar(255)
-  position             player_position? @default(None)
-  price                Float?           @db.Real
-  image                String?          @db.VarChar(255)
-  shirt_number         Int?             @db.SmallInt
-  club_id              Int?
-  point                Int?
-  name_ru              String?          @db.VarChar(255)
-  player_link          String?          @db.VarChar(255)
-  native               String?          @db.VarChar(255)
-  slug                 String?          @db.VarChar(255)
-  competition_id       Int?
-  created_at           DateTime?        @default(now()) @db.Timestamptz(6)
-  updated_at           DateTime?        @default(now()) @db.Timestamptz(6)
-  deleted_at           DateTime?        @db.Timestamptz(6)
-  created_by           Int?
-  updated_by           Int?
-  deleted_by           Int?
-  team_count           Int?
-  percentage           Int?
-  is_actualized        Boolean?
-  played_min           Int?             @default(0) @db.SmallInt
-  goal                 Int?             @default(0) @db.SmallInt
-  goal_asist           Int?             @default(0) @db.SmallInt
-  missed_penalty       Int?             @default(0) @db.SmallInt
-  every_2_missed_goals Int?             @default(0) @db.SmallInt
-  yellow_card          Int?             @default(0) @db.SmallInt
-  blocked_penalty      Int?             @default(0)
-  autogoal             Int?             @default(0)
-  red_card             Int?             @default(0)
+  id             Int              @default(autoincrement())
+  name           String?          @db.VarChar(255)
+  position       player_position? @default(None)
+  price          Float?           @db.Real
+  image          String?          @db.VarChar(255)
+  shirt_number   Int?             @db.SmallInt
+  club_id        Int?
+  point          Int?
+  name_ru        String?          @db.VarChar(255)
+  player_link    String?          @db.VarChar(255)
+  native         String?          @db.VarChar(255)
+  slug           String?          @db.VarChar(255)
+  competition_id Int?
+  created_at     DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime?        @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+  team_count     Int?
+  percentage     Int?
 
   @@ignore
 }
@@ -335,7 +346,6 @@ model player_point {
   season_id            Int?
   blocked_penalty      Int?      @default(0)
   autogoal             Int?      @default(0)
-  match_name           String?   @db.VarChar(255)
 
   @@ignore
 }
@@ -369,7 +379,6 @@ model player_result {
   deleted_by           Int?
   blocked_penalty      Int?             @default(0)
   autogoal             Int?             @default(0)
-  match_name           String?          @db.VarChar(255)
 
   @@ignore
 }
@@ -382,13 +391,7 @@ model prize {
   competition_id Int?
   type           prize_type?
   order          Int?        @db.SmallInt
-  created_at     DateTime?   @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime?   @default(now()) @db.Timestamptz(6)
-  deleted_at     DateTime?   @db.Timestamptz(6)
-  created_by     Int?
-  deleted_by     Int?
   updated_by     Int?
-  name_ru        String?     @db.VarChar(255)
 
   @@ignore
 }
@@ -404,11 +407,7 @@ model season {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-}
-
-model subscribtion {
-  id    Int   @id @default(autoincrement())
-  price Float
+  team       team[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -420,7 +419,7 @@ model system_config {
   is_list    Boolean?
   group      String?      @db.VarChar(255)
   name       String?      @db.VarChar(255)
-  created_at DateTime?    @default(now()) @db.Timestamp(6)
+  created_at DateTime?    @db.Timestamp(6)
   updated_at DateTime?    @db.Timestamp(6)
   deleted_at DateTime?    @db.Timestamp(6)
   created_by Int?
@@ -443,7 +442,6 @@ model system_language {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-  is_exclude Boolean?
 
   @@ignore
 }
@@ -455,7 +453,7 @@ model system_notification {
   desc         String?
   read_at      DateTime? @db.Timestamptz(6)
   name         String?   @db.VarChar(255)
-  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  created_at   DateTime? @db.Timestamptz(6)
   updated_at   DateTime? @db.Timestamptz(6)
   deleted_at   DateTime? @db.Timestamptz(6)
   created_by   Int?
@@ -468,16 +466,291 @@ model system_notification {
   @@ignore
 }
 
-model users {
-  id       Int    @id @default(autoincrement())
-  name     String
-  lastname String
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model goal {
+  id          Int       @default(autoincrement())
+  player_id   Int?
+  match_id    Int?
+  is_own_goal Int?      @db.SmallInt
+  time        String?   @db.VarChar(10)
+  is_penalty  Int?      @db.SmallInt
+  name        String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime? @db.Timestamptz(6)
+  created_by  Int?
+  updated_by  Int?
+  deleted_by  Int?
+
+  @@ignore
 }
 
-model usersub {
-  id      Int  @id @default(autoincrement())
-  user_id Int?
-  subs_id Int?
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model system_table {
+  id             Int       @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  is_active      Boolean?
+  t_tables       t_tables?
+  field_hidden   Json?
+  field_readonly Json?
+  role           roles?
+  deny_read      Boolean?
+  deny_edit      Boolean?
+  deny_create    Boolean?
+  deny_delete    Boolean?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @db.Timestamptz(6)
+  deleted_at     DateTime? @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+
+  @@ignore
+}
+
+model team {
+  id                      Int          @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_3") @default(autoincrement())
+  name                    String?      @unique(map: "name_unique") @db.VarChar(255)
+  user_id                 Int?
+  competition_id          Int?
+  formation               forms?       @default(f4_3_3)
+  DEF                     Int?         @db.SmallInt
+  MID                     Int?         @db.SmallInt
+  STR                     Int?         @db.SmallInt
+  registered_tour_id      Int?
+  season_id               Int?
+  point                   Float?       @default(0) @db.Real
+  order                   Int?         @default(0)
+  balance                 Float?       @default(100) @db.Real
+  is_team_created         Boolean      @default(false)
+  count_of_transfers      Int?         @default(2)
+  transfers_from_one_team Int?         @default(2)
+  created_at              DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime?    @default(now()) @db.Timestamptz(6)
+  deleted_at              DateTime?    @db.Timestamptz(6)
+  created_by              Int?
+  updated_by              Int?
+  deleted_by              Int?
+  last_tour_point         Int?         @default(0)
+  competition             competition? @relation(fields: [competition_id], references: [id], onUpdate: SetNull)
+  season                  season?      @relation(fields: [season_id], references: [id], onUpdate: SetNull)
+  user                    user?        @relation(fields: [user_id], references: [id], onUpdate: SetNull)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model team_player {
+  id             Int              @default(autoincrement())
+  player_id      Int?
+  order_number   Int?             @db.SmallInt
+  is_captain     Boolean?         @default(false)
+  team_id        Int?
+  position       player_position?
+  club_id        Int?
+  point          Int?
+  name           String?          @db.VarChar(255)
+  price          Float?           @db.Real
+  tour_id        Int?
+  competition_id Int?
+  user_id        Int?
+  created_at     DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime?        @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model team_player_club {
+  id             BigInt    @default(autoincrement())
+  team_id        Int?
+  club_id        Int?
+  count          Int?
+  slug           String?   @db.VarChar
+  tour_id        Int?
+  competition_id Int?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime? @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+  name           String?   @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tour {
+  id             Int          @default(autoincrement())
+  season_id      Int?
+  name           String?      @db.VarChar(255)
+  status         tour_status?
+  competition_id Int?
+  datetime_start DateTime?    @db.Timestamptz(6)
+  order          Int?
+  datetime_end   DateTime?    @db.Timestamptz(0)
+  created_at     DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?    @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime?    @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tour_team {
+  id                         Int       @default(autoincrement())
+  user_id                    Int?
+  tour_id                    Int?
+  purchased_players          Int?      @db.SmallInt
+  is_purchase_locked         Boolean?
+  team_id                    Int?
+  price                      Float?    @db.Real
+  point                      Float?    @db.Real
+  competition_id             Int?
+  season_id                  Int?
+  captain_id                 Int?
+  current_count_of_transfers Int?      @default(0)
+  created_at                 DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at                 DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at                 DateTime? @db.Timestamptz(6)
+  created_by                 Int?
+  updated_by                 Int?
+  deleted_by                 Int?
+  name                       String?   @db.VarChar(255)
+
+  @@ignore
+}
+
+model user {
+  id                                       Int           @id @default(autoincrement())
+  guid                                     String?       @db.Uuid
+  company_id                               Int?
+  role                                     roles?        @default(user)
+  name                                     String?       @db.VarChar(255)
+  email                                    String        @unique(map: "user_email_idx") @db.VarChar(255)
+  phone                                    String?       @unique(map: "user_phone_idx") @db.VarChar(255)
+  is_active                                Boolean?
+  photo                                    String?
+  is_super_admin                           Boolean?
+  phone_second                             String?       @db.VarChar(255)
+  phone_telegram                           String?       @db.VarChar(255)
+  notes                                    String?
+  is_developer                             Boolean?
+  telegram_user                            String?       @db.VarChar(255)
+  grid_resize                              Json?
+  grid_drag_drop                           Json?
+  is_notified                              Boolean?
+  sms_code                                 String?       @db.VarChar(255)
+  sms_created_at                           DateTime?     @db.Timestamptz(6)
+  last_name                                String?
+  middle_name                              String?
+  gender                                   String?
+  birth_date                               DateTime?     @db.Date
+  bio                                      String?
+  balance                                  Float?        @default(0)
+  created_at                               DateTime?     @db.Timestamptz(6)
+  updated_at                               DateTime?     @db.Timestamptz(6)
+  deleted_at                               DateTime?     @db.Timestamptz(6)
+  created_by                               Int?
+  updated_by                               Int?
+  deleted_by                               Int?
+  language                                 language?     @default(uz)
+  enable_notification                      Boolean?      @default(true)
+  phone_verified                           Boolean?      @default(false)
+  company_company_created_byTouser         company[]     @relation("company_created_byTouser")
+  company_company_deleted_byTouser         company[]     @relation("company_deleted_byTouser")
+  company_company_updated_byTouser         company[]     @relation("company_updated_byTouser")
+  competition_competition_created_byTouser competition[] @relation("competition_created_byTouser")
+  competition_competition_deleted_byTouser competition[] @relation("competition_deleted_byTouser")
+  competition_competition_updated_byTouser competition[] @relation("competition_updated_byTouser")
+  country_country_created_byTouser         country[]     @relation("country_created_byTouser")
+  country_country_deleted_byTouser         country[]     @relation("country_deleted_byTouser")
+  country_country_updated_byTouser         country[]     @relation("country_updated_byTouser")
+  team                                     team[]
+  company_user_company_idTocompany         company?      @relation("user_company_idTocompany", fields: [company_id], references: [id], onUpdate: SetNull)
+
+  @@index([name], map: "name_user_copy1")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_activity {
+  id             Int         @default(autoincrement())
+  user_id        Int?
+  activity       user_event?
+  team_id        Int?
+  name_uz        String?
+  created_at     DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?   @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime?   @db.Timestamptz(6)
+  created_by     Int?
+  updated_by     Int?
+  deleted_by     Int?
+  name_ru        String?
+  name_en        String?
+  tour_id        Int?
+  competition_id Int?
+  name           String?     @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_payment {
+  id            Int       @default(autoincrement())
+  user_id       Int
+  in_amount     Int?
+  added_balance Int?
+  currency      String?   @db.VarChar(10)
+  name          String?   @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at    DateTime? @db.Timestamptz(6)
+  created_by    Int?
+  updated_by    Int?
+  deleted_by    Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_player {
+  id            Int       @default(autoincrement())
+  player_id     Int?
+  user_match_id Int?
+  is_lineup_11  Int?      @db.SmallInt
+  played_min    Int?      @db.SmallInt
+  is_captain    Boolean?
+  name          String?   @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at    DateTime? @db.Timestamptz(6)
+  created_by    Int?
+  updated_by    Int?
+  deleted_by    Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_prize {
+  id             Int     @default(autoincrement())
+  name           String? @db.VarChar(255)
+  competition_id Int?
+  season_id      Int?
+  team_id        Int?
+  user_id        Int?
+  prize_id       Int?
+  team_point     Int?
+  prize_order    Int?    @db.SmallInt
+  updated_by     Int?
+
+  @@ignore
 }
 
 enum System {
@@ -494,8 +767,11 @@ enum TransactionStatus {
 }
 
 enum banner_type {
-  dynamic
-  static
+  modal_banner
+  mini_banner
+  big_banner
+  side_banner_right
+  side_banner_left
 }
 
 enum config_key {
@@ -536,12 +812,11 @@ enum customer_type {
 }
 
 enum forma {
-  A
-  B
-  C
-  D
-  E
-  F
+  a3
+  a4
+  a5
+  a2
+  a1
 }
 
 enum formas {
@@ -594,13 +869,11 @@ enum pay_system {
   click
   payme
   balance
-  uzum
 }
 
 enum pay_system_ext {
   click
   payme
-  uzum
 }
 
 enum player_position {
@@ -621,8 +894,8 @@ enum point_action {
   red_card
   yellow_card
   is_shutout
+  blocked_penalty      @map("blocked penalty")
   autogoal
-  blocked_penalty
 }
 
 enum position {
@@ -695,4 +968,13 @@ enum user_event {
   buy_package_one_team
   player_buy
   player_sell
+}
+
+enum forms {
+  f3_5_2
+  f3_4_3
+  f4_3_3
+  f5_3_2
+  f5_4_1
+  f4_4_2
 }
