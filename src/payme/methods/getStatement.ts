@@ -37,8 +37,8 @@ export async function getStatement(
         price: transaction.price,
         account: { user_id: transaction.user_id },
         create_time: new Date(transaction.created_at).getTime(),
-        perform_time: transaction.updated_at
-          ? new Date(transaction.updated_at).getTime()
+        perform_time: transaction.perform_time
+          ? new Date(transaction.perform_time).getTime()
           : null,
         cancel_time: transaction.canceled_at
           ? new Date(transaction.canceled_at).getTime()

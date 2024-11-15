@@ -8,7 +8,7 @@ export async function cancelTransaction(
 ) {
   const transId = cancelTransactionDto.params.id;
 
-  const transaction = await this.prismaService.pay_balance.findFirst({
+  const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: transId },
   });
 
@@ -25,9 +25,17 @@ export async function cancelTransaction(
     };
   }
 
+  if (transaction.status === TransactionState.Paid) {
+    return {
+      error: {
+        code: ErrorStatusCodes.TransactionNotFound,
+      },
+    };
+  }
+
   if (transaction.state === TransactionState.Pending) {
     const canceledTransaction = await this.prismaService.pay_balance.update({
-      where: { id: transaction.id },
+      where: { id: transaction?.id },
       data: {
         status: TransactionState.PaidCanceled,
         state: TransactionState.PendingCanceled,
@@ -39,7 +47,7 @@ export async function cancelTransaction(
     return {
       result: {
         cancel_time: canceledTransaction.canceled_at?.getTime(),
-        transaction: canceledTransaction.id,
+        transaction: canceledTransaction.transaction_id.toString(),
         state: TransactionState.PendingCanceled,
       },
     };
@@ -48,7 +56,7 @@ export async function cancelTransaction(
   return {
     result: {
       state: transaction.state,
-      transaction: transaction.id,
+      transaction: transaction.transaction_id.toString(),
       cancel_time: transaction.canceled_at?.getTime(),
     },
   };

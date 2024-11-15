@@ -27,6 +27,7 @@ export async function performTransaction(
 
   if (transaction.state !== TransactionState.Pending) {
     if (transaction.state !== TransactionState.Paid) {
+      // Make sure transaction status is PAID
       return {
         error: PaymeError.CantDoOperation,
         id: performTransactionDto.params.id,
@@ -50,7 +51,7 @@ export async function performTransaction(
     await this.prismaService.pay_balance.update({
       where: { id: transaction.id },
       data: {
-        status: 'CANCELED',
+        status: TransactionState.PendingCanceled.toString(),
         canceled_at: new Date(),
         state: TransactionState.PendingCanceled,
         reason: Number(CancelingReasons.CanceledDueToTimeout),
@@ -72,16 +73,16 @@ export async function performTransaction(
   const updatedTransaction = await this.prismaService.pay_balance.update({
     where: { id: transaction.id },
     data: {
-      status: 'PAID',
+      status: TransactionState.Paid.toString(),
       state: TransactionState.Paid,
-      updated_at: performTime,
+      perform_time: performTime,
     },
   });
 
   return {
     result: {
-      transaction: updatedTransaction.id,
-      perform_time: performTime.getTime(),
+      transaction: updatedTransaction.transanaction_id.toString(),
+      perform_time: updatedTransaction.performTime,
       state: TransactionState.Paid,
     },
   };

@@ -1,4 +1,5 @@
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { TransactionState } from '../constants/transaction-state';
 import { CheckTransactionDto } from '../dto/check-transaction.dto';
 
 export async function checkTransaction(
@@ -7,9 +8,10 @@ export async function checkTransaction(
 ) {
   const transactionId = checkTransactionDto.params.id;
 
-  const transaction = await this.prismaService.pay_balance.findFirst({
+  const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: transactionId },
   });
+
   if (!transaction) {
     return {
       error: {
@@ -36,7 +38,7 @@ export async function checkTransaction(
     };
   }
 
-  if (transaction.status === 'paid') {
+  if (transaction.status === TransactionState.Paid) {
     return {
       error: {
         code: 1009,
@@ -57,10 +59,7 @@ export async function checkTransaction(
         ? new Date(transaction.canceled_at).getTime()
         : 0,
       transaction: transaction.transaction_id,
-      state:
-        transaction.state !== null && transaction.state !== undefined
-          ? transaction.state
-          : 2,
+      state: transaction.state ? transaction.state : 2,
       reason: transaction.reason,
     },
   };

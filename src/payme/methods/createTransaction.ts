@@ -4,14 +4,17 @@ import { TransactionState } from '../constants/transaction-state';
 import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { pay_system } from '@prisma/client';
 
 export async function createTransaction(
   this: any,
   createTransactionDto: CreateTransactionDto,
 ) {
-  const userId = Number(createTransactionDto.params?.account?.user_id);
+  const user_id = Number(createTransactionDto.params?.account?.user_id);
   const amount = createTransactionDto.params.amount;
-  if (!userId) {
+  const transaction_id = createTransactionDto.params.id;
+
+  if (!user_id) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAuthorization,
@@ -24,10 +27,11 @@ export async function createTransaction(
     };
   }
 
-  const subid = await this.prismaService.usersub.findFirst({
-    where: { id: userId },
+  const user = await this.prismaService.user.findUnique({
+    where: { id: user_id },
   });
-  if (!subid || !subid.subs_id) {
+
+  if (!user) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
@@ -39,35 +43,13 @@ export async function createTransaction(
       },
     };
   }
-  const sub_id = subid.subs_id;
-  const balance = await this.prismaService.subscribtion.findFirst({
-    where: { id: sub_id, price: amount },
+
+  const transId = await this.prismaService.pay_balance.findUnique({
+    where: { transaction_id },
   });
-
-  if (!balance) {
-    return {
-      error: {
-        code: ErrorStatusCodes.InvalidAmount,
-        message: {
-          ru: 'Неверная сумма',
-          uz: 'Incorrect amount',
-          en: 'Incorrect amount',
-        },
-      },
-    };
-  }
-
-  if (typeof balance.price !== 'number' || balance.price < amount / 100) {
-    return { error: PaymeError.InsufficientFunds };
-  }
-
-  const transId = await this.prismaService.pay_balance.findFirst({
-    where: { transaction_id: createTransactionDto.params.id },
-  });
-  console.log('transId', transId);
 
   if (transId) {
-    if (transId.status !== 'pending') {
+    if (transId.status !== TransactionState.Pending) {
       return {
         error: PaymeError.CantDoOperation,
         id: transId.transaction_id,
@@ -86,9 +68,9 @@ export async function createTransaction(
   const checkTransaction: CheckPerformTransactionDto = {
     method: TransactionMethods.CheckPerformTransaction,
     params: {
-      amount: balance.price,
+      amount: amount,
       account: {
-        user_id: userId?.toString(),
+        user_id: user_id.toString(),
       },
     },
   };
@@ -104,10 +86,12 @@ export async function createTransaction(
 
   const newTransaction = await this.prismaService.pay_balance.create({
     data: {
-      user_id: userId,
-      price: balance.price,
-      transaction_id: createTransactionDto.params.id,
-      state: 1,
+      user_id,
+      price: amount,
+      transaction_id,
+      state: TransactionState.Pending,
+      status: TransactionState.Pending,
+      system: pay_system.payme,
       created_at: new Date(),
       updated_at: new Date(),
     },

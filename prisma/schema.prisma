@@ -289,7 +289,7 @@ model pay_balance {
   reason         Int?
   canceled_at    DateTime?       @db.Timestamptz(6)
   perform_time   DateTime?       @db.Timestamptz(6)
-  status         Int?
+  status         String?         @db.VarChar(32)
   user           user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }
 

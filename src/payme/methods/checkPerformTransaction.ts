@@ -9,6 +9,8 @@ export async function checkPerformTransaction(
     ? Number(checkPerformTransactionDto.params?.account?.user_id)
     : null;
   const price = checkPerformTransactionDto.params.amount;
+  const PAYME_MIN_AMOUNT = Number(process.env.PAYME_MIN_AMOUNT);
+  const PAYME_MAX_AMOUNT = Number(process.env.PAYME_MAX_AMOUNT);
 
   if (!userId) {
     return {
@@ -23,15 +25,11 @@ export async function checkPerformTransaction(
     };
   }
 
-  const uzer_id = await this.prismaService.subscribtion.findFirst({
+  const user_id = await this.prismaService.user.findUnique({
     where: { id: userId },
   });
 
-  const balance = await this.prismaService.subscribtion.findFirst({
-    where: { id: userId, price: price },
-  });
-
-  if (!uzer_id) {
+  if (!user_id) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,
@@ -44,20 +42,7 @@ export async function checkPerformTransaction(
     };
   }
 
-  if (!balance) {
-    return {
-      error: {
-        code: ErrorStatusCodes.InvalidAmount,
-        message: {
-          ru: 'Неверная сумма',
-          uz: 'Incorrect amount',
-          en: 'Incorrect amount',
-        },
-      },
-    };
-  }
-
-  if (price < 1 || price > 999999999 || price > balance?.price) {
+  if (price < PAYME_MIN_AMOUNT || price > PAYME_MAX_AMOUNT) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,
