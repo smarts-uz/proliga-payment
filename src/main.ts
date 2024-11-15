@@ -4,11 +4,11 @@ import { ConfigModule } from '@nestjs/config';
 
 async function bootstrap() {
   // ConfigModule.forRoot({
-  //   isGlobal: true, 
+  //   isGlobal: true,
   // });
-  
+
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 3020);
 }
 
 bootstrap();
