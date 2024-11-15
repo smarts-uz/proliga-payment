@@ -5,15 +5,14 @@ import { ClickError } from 'src/enum/Payment.enum';
 import { TransactionStatus } from '../constants/status-codes';
 
 export async function prepare(this: any, clickReqBody: ClickRequestDto) {
-  const serviceId = Number(process.env.CLICK_SERVICE_ID);
-
   const merchantTransId = clickReqBody.merchant_trans_id;
   const userId = Number(clickReqBody.user_id);
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
-  const action = 0;
+  const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
+  const time = new Date();
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
@@ -34,46 +33,17 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Invalid sign_string',
     };
   }
-  const isValidUserId = this.checkObjectId(userId);
 
-  if (!isValidUserId) {
+  if (!userId || typeof userId !== 'number') {
     return {
       error: ClickError.BadRequest,
       error_note: 'Invalid user_id, user_id must be number',
     };
   }
 
-  const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
+  const user = await this.prismaService.user.findUnique({
     where: {
-      transaction_id: transId.toString(),
-      status: 'PAID',
-    },
-  });
-
-  if (isAlreadyPaid) {
-    return {
-      error: ClickError.AlreadyPaid,
-      error_note: 'Already paid',
-    };
-  }
-
-  const isCancelled = await this.prismaService.pay_balance.findFirst({
-    where: {
-      user_id: Number(userId),
-      status: TransactionStatus.Canceled,
-    },
-  });
-
-  if (isCancelled) {
-    return {
-      error: ClickError.TransactionCanceled,
-      error_note: 'Cancelled',
-    };
-  }
-
-  const user = await this.prismaService.users.findFirst({
-    where: {
-      id: Number(userId),
+      id: userId,
     },
   });
 
@@ -84,29 +54,36 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const existingTransaction = await this.prismaService.pay_balance.findFirst({
+  const existingTransaction = await this.prismaService.pay_balance.findUnique({
     where: {
       transaction_id: transId.toString(),
     },
   });
 
-  if (
-    existingTransaction &&
-    existingTransaction.status === TransactionStatus.Canceled
-  ) {
+  if (existingTransaction?.status === TransactionStatus.Paid) {
     return {
-      error: ClickError.TransactionCanceled,
-      error_note: 'Transaction canceled',
+      error: ClickError.AlreadyPaid,
+      error_note: 'Already paid',
     };
   }
-  if (existingTransaction) {
-    return 'Transaction ID already exists.';
+
+  if (existingTransaction?.status === TransactionStatus.Canceled) {
+    return {
+      error: ClickError.TransactionCanceled,
+      error_note: 'Cancelled',
+    };
   }
-  const time = new Date();
+
+  if (existingTransaction) {
+    return {
+      error: ClickError.AlreadyPaid,
+      error_note: 'Transaction ID already exists.',
+    };
+  }
 
   await this.prismaService.pay_balance.create({
     data: {
-      user_id: Number(userId),
+      user_id: userId,
       transaction_id: transId.toString(),
       status: TransactionStatus.Pending,
       system: PAYMENTSYSTEM.CLICK,

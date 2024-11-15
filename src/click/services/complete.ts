@@ -4,8 +4,6 @@ import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.inter
 import { ClickError } from 'src/enum/Payment.enum';
 
 export async function complete(this: any, clickReqBody: ClickRequestDto) {
-  const serviceId = Number(process.env.CLICK_SERVICE_ID);
-
   const merchantTransId = clickReqBody.merchant_trans_id;
   const userId = clickReqBody.user_id;
   const amount = clickReqBody.amount;
@@ -34,7 +32,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const user = await this.prismaService.users.findFirst({
+  const user = await this.prismaService.user.findUnique({
     where: {
       id: Number(userId),
     },
@@ -47,27 +45,22 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  const isPrepared = await this.prismaService.pay_balance.findFirst({
-    where: {
-      user_id: Number(userId),
+  const isPreparedTransaction = await this.prismaService.pay_balance.findUnique(
+    {
+      where: {
+        transaction_id: transId?.toString(),
+      },
     },
-  });
+  );
 
-  if (!isPrepared) {
+  if (!isPreparedTransaction) {
     return {
       error: ClickError.TransactionNotFound,
       error_note: 'Invalid merchant_prepare_id',
     };
   }
 
-  const isAlreadyPaid = await this.prismaService.pay_balance.findFirst({
-    where: {
-      transaction_id: transId?.toString(),
-      status: TransactionStatus.Paid,
-    },
-  });
-
-  if (isAlreadyPaid) {
+  if (isPreparedTransaction?.status === TransactionStatus.Paid) {
     return {
       error: ClickError.AlreadyPaid,
       error_note: 'Already paid',
@@ -77,7 +70,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   if (clickReqBody.error > 0) {
     await this.prismaService.pay_balance.update({
       where: {
-        id: isPrepared.id,
+        id: isPreparedTransaction.id,
       },
       data: {
         status: TransactionStatus.Canceled,
@@ -91,7 +84,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   await this.prismaService.pay_balance.update({
     where: {
-      id: isPrepared.id,
+      id: isPreparedTransaction.id,
     },
     data: {
       status: TransactionStatus.Paid,
