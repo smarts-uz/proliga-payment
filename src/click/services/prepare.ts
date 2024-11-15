@@ -73,7 +73,6 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Cancelled',
     };
   }
-
   if (existingTransaction) {
     return {
       error: ClickError.AlreadyPaid,
