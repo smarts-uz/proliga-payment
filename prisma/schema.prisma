@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model action {
   id         Int              @id @default(autoincrement())
   position   player_position?
@@ -21,6 +22,7 @@ model action {
   name       String?          @db.VarChar(255)
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model banner {
   id          Int           @id(map: "advertisement_pkey") @default(autoincrement())
   start_date  DateTime      @db.Date
@@ -41,6 +43,7 @@ model banner {
   banner_view banner_view[]
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model banner_view {
   id         BigInt    @id @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -59,6 +62,7 @@ model banner_view {
   banner     banner    @relation(fields: [banner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_banner_id")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model card {
   id                         Int       @id @default(autoincrement())
   player_id                  Int?
@@ -78,6 +82,7 @@ model card {
   user_card_updated_byTouser user?     @relation("card_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull)
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model club {
   id                               Int             @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
   name                             String?         @db.VarChar(255)
@@ -114,6 +119,7 @@ model club {
   @@index([id], map: "club_id_index")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model company {
   id                            Int       @id @default(autoincrement())
   name                          String?   @unique @db.VarChar(255)
@@ -146,6 +152,7 @@ model company {
   @@index([name], map: "name_company_copy1")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model competition {
   title                             String          @db.VarChar(255)
   counter                           String?         @db.VarChar(255)
@@ -186,6 +193,7 @@ model competition {
   user_prize                        user_prize[]
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model country {
   id                            Int           @id(map: "_copy_1_copy_1_copy_1_copy_1") @default(autoincrement())
   name                          String?       @db.VarChar(255)
@@ -203,7 +211,7 @@ model country {
   user_country_updated_byTouser user?         @relation("country_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model match {
   id                              Int             @id(map: "_copy_1") @default(autoincrement())
   home_club_id                    Int?
@@ -241,10 +249,9 @@ model match {
   @@index([away_club_id], map: "inded_away_id")
   @@index([home_club_id], map: "index_home_id")
   @@index([id], map: "index_id")
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model news {
   id         Int       @id @default(autoincrement())
   name       String?   @db.VarChar(255)
@@ -259,10 +266,9 @@ model news {
   deleted_by Int?
   name_ru    String?   @db.VarChar(255)
   user       user?     @relation(fields: [author_id], references: [id], onUpdate: SetNull)
-
-  @@ignore
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_balance {
   id             Int             @id(map: "pay_expense_copy1_pkey") @default(autoincrement())
   name           String?         @db.VarChar(255)
@@ -271,7 +277,7 @@ model pay_balance {
   system         pay_system_ext?
   transaction_id String?         @unique(map: "uk_transaction_id_py_balnce") @db.VarChar(255)
   currency_code  Int?            @db.SmallInt
-  state          Int?            @db.SmallInt
+  state          Int?
   updated_time   DateTime?       @db.Timestamptz(6)
   detail         String?         @db.VarChar(255)
   created_at     DateTime?       @default(now()) @db.Timestamptz(6)
@@ -280,14 +286,14 @@ model pay_balance {
   created_by     Int?
   updated_by     Int?
   deleted_by     Int?
-  status         String?         @default("pending")
   reason         Int?
   canceled_at    DateTime?       @db.Timestamptz(6)
   perform_time   DateTime?       @db.Timestamptz(6)
+  status         Int?
   user           user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_expense {
   id               Int               @id @default(autoincrement())
   name             String?           @db.VarChar(255)
@@ -307,7 +313,7 @@ model pay_expense {
   system           pay_system?
   transaction_id   String?           @unique(map: "uk_transaction_id") @db.VarChar(32)
   currency_code    Int?              @db.SmallInt
-  state            Int?              @db.SmallInt
+  state            Int?
   updated_time     DateTime?         @db.Timestamptz(6)
   detail           String?           @db.VarChar(255)
   season_id        Int?
@@ -321,11 +327,9 @@ model pay_expense {
   pay_package      pay_package?      @relation(fields: [pay_package_id], references: [id], onUpdate: SetNull)
   team             team?             @relation(fields: [team_id], references: [id], onUpdate: SetNull)
   user             user?             @relation(fields: [user_id], references: [id], onUpdate: SetNull)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pay_package {
   id          Int               @id(map: "pay_income_copy1_pkey") @default(autoincrement())
   name_uz     String?           @db.VarChar(255)
@@ -341,11 +345,9 @@ model pay_package {
   updated_by  Int?
   deleted_by  Int?
   pay_expense pay_expense[]
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player {
   id                   Int              @id(map: "_copy_1_copy_1_copy_1_copy_1_copy_2") @default(autoincrement())
   name                 String?          @db.VarChar(255)
@@ -389,10 +391,9 @@ model player {
   @@index([club_id], map: "club_id")
   @@index([club_id, competition_id], map: "idx_player_club_competition")
   @@index([id], map: "player_index_id")
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player_point {
   id                   Int            @id @default(autoincrement())
   player_id            Int?
@@ -431,10 +432,9 @@ model player_point {
   tour                 tour?          @relation(fields: [tour_id], references: [id], onUpdate: SetNull, map: "tour_team_tour_id_fkey")
 
   @@index([player_id, match_id, tour_id], map: "idx_player_point_player_match_tour")
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model player_result {
   id                   Int              @id @default(autoincrement())
   player_id            Int?
@@ -473,10 +473,9 @@ model player_result {
   tour                 tour?            @relation(fields: [tour_id], references: [id], onUpdate: SetNull, map: "tour_team_tour_id_fkey")
 
   @@index([player_id, match_id, tour_id], map: "idx_player_result_player_match_tour")
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model prize {
   id             Int          @id @default(autoincrement())
   name           String?      @db.VarChar(255)
@@ -493,10 +492,9 @@ model prize {
   name_ru        String?      @db.VarChar(255)
   competition    competition? @relation(fields: [competition_id], references: [id], onUpdate: SetNull)
   user_prize     user_prize[]
-
-  @@ignore
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model season {
   id            Int             @id(map: "_copy_1_copy_1") @default(autoincrement())
   number        Int?
@@ -518,7 +516,7 @@ model season {
   user_prize    user_prize[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_config {
   id         BigInt       @id @default(autoincrement())
   key        config_key
@@ -533,11 +531,9 @@ model system_config {
   created_by Int?
   updated_by Int?
   deleted_by Int?
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_language {
   id                                    Int       @id @default(autoincrement())
   name                                  String?   @db.VarChar(255)
@@ -554,11 +550,9 @@ model system_language {
   user_system_language_created_byTouser user?     @relation("system_language_created_byTouser", fields: [created_by], references: [id], onUpdate: SetNull)
   user_system_language_deleted_byTouser user?     @relation("system_language_deleted_byTouser", fields: [deleted_by], references: [id], onUpdate: SetNull)
   user_system_language_updated_byTouser user?     @relation("system_language_updated_byTouser", fields: [updated_by], references: [id], onUpdate: SetNull)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model system_notification {
   id           Int       @id @default(autoincrement())
   user_id      Int?
@@ -575,8 +569,6 @@ model system_notification {
   is_sms       Boolean?  @default(false)
   is_email     Boolean?  @default(false)
   user         user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
-
-  @@ignore
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -884,6 +876,15 @@ enum customer_type {
   bad
 }
 
+enum forms {
+  f3_5_2
+  f3_4_3
+  f4_3_3
+  f5_3_2
+  f5_4_1
+  f4_4_2
+}
+
 enum gender {
   male
   female
@@ -1026,13 +1027,4 @@ enum user_event {
   buy_package_one_team
   player_buy
   player_sell
-}
-
-enum forms {
-  f3_5_2
-  f3_4_3
-  f4_3_3
-  f5_3_2
-  f5_4_1
-  f4_4_2
 }
