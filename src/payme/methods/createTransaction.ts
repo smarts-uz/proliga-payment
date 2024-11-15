@@ -8,6 +8,7 @@ import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { copyFileSync } from 'node:fs';
 import { loadEnvFile } from 'node:process';
 import * as console from "node:console";
+import { pay_system } from '@prisma/client';
 
 
 export async function createTransaction(
@@ -51,7 +52,7 @@ export async function createTransaction(
   });
 
   if (transId) {
-    if (transId.status !== 'pending') {
+    if (transId.status !== TransactionState.Pending) {
       return {
         error: PaymeError.CantDoOperation,
         id: transId.transaction_id,
@@ -91,11 +92,14 @@ export async function createTransaction(
       user_id: userId,
       price: amount,
       transaction_id: createTransactionDto.params.id,
-      state: 1,
+      state: TransactionState.Pending,
+      status: TransactionState.Pending,
+      system: pay_system.payme,
       created_at: new Date(),
       updated_at: new Date(),
     },
   });
+
 
   return {
     result: {

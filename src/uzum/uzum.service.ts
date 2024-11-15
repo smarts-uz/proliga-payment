@@ -63,7 +63,7 @@ export class UzumService {
         user_id: Number(createTransactionDto.params.userId),
         price:  Number(price),
         // system: "uzum",
-        status: 'PENDING',
+        // status: 'PENDING',
         created_at: new Date(),
         name: name
       },
@@ -95,15 +95,15 @@ export class UzumService {
       throw this.createBadRequestError(serviceId, ErrorStatusCode.AdditionalPaymentPropertyNotFound);
     }
 
-    if (transaction.status !== 'PENDING') {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.PaymentAlreadyProcessed);
-    }
+    // if (transaction.status !== 'PENDING') {
+    //   throw this.createBadRequestError(serviceId, ErrorStatusCode.PaymentAlreadyProcessed);
+    // }
 
     await this.prismaService.pay_balance.update({
       where: { id: Number(transId) },
       data: {
         updated_at: new Date(),
-        status: 'PAID',
+        // status: 'PAID',
       },
     });
 
@@ -135,7 +135,7 @@ export class UzumService {
       where: { id: Number(transId) },
       data: {
         created_at: new Date(),
-        status: 'CANCELED',
+        // status: 'CANCELED',
       },
     });
 

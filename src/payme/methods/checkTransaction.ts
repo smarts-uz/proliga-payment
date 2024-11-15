@@ -50,6 +50,8 @@ export async function checkTransaction(
     };
   }
 
+  // console.log("iD", transaction)
+
   return {
     result: {
       create_time: new Date(transaction.created_at).getTime(),

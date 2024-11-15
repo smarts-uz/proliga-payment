@@ -36,9 +36,9 @@ export async function performTransaction(
     return {
       result: {
         state: transaction.state,
-        transaction: transaction.id,
-        perform_time: transaction.updated_at
-          ? new Date(transaction.updated_at).getTime()
+        transaction: transaction.transaction_id.toString(),
+        perform_time: transaction.perform_time
+          ? new Date(transaction.perform_time).getTime()
           : null,
       },
     };
@@ -50,7 +50,7 @@ export async function performTransaction(
     await this.prismaService.pay_balance.update({
       where: { id: transaction.id },
       data: {
-        status: 'CANCELED',
+        status: TransactionState.PaidCanceled,
         canceled_at: new Date(),
         state: TransactionState.PendingCanceled,
         reason: Number(CancelingReasons.CanceledDueToTimeout),
@@ -72,16 +72,16 @@ export async function performTransaction(
   const updatedTransaction = await this.prismaService.pay_balance.update({
     where: { id: transaction.id },
     data: {
-      status: 'PAID',
+      status: TransactionState.Paid,
       state: TransactionState.Paid,
-      updated_at: performTime,
+      perform_time: performTime,
     },
   });
 
   return {
     result: {
-      transaction: updatedTransaction.id,
-      perform_time: performTime.getTime(),
+      transaction: updatedTransaction.transaction_id.toString(),
+      perform_time: updatedTransaction.performTime,
       state: TransactionState.Paid,
     },
   };
