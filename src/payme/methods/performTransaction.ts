@@ -8,7 +8,7 @@ export async function performTransaction(
   this: any,
   performTransactionDto: PerformTransactionDto,
 ) {
-  const transaction = await this.prismaService.pay_balance.findFirst({
+  const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: performTransactionDto.params.id },
   });
 
@@ -37,9 +37,9 @@ export async function performTransaction(
     return {
       result: {
         state: transaction.state,
-        transaction: transaction.id,
-        perform_time: transaction.updated_at
-          ? new Date(transaction.updated_at).getTime()
+        transaction: transaction.transaction_id.toString(),
+        perform_time: transaction.perform_time
+          ? new Date(transaction.perform_time).getTime()
           : null,
       },
     };
@@ -81,8 +81,8 @@ export async function performTransaction(
 
   return {
     result: {
-      transaction: updatedTransaction.transanaction_id.toString(),
-      perform_time: updatedTransaction.performTime,
+      transaction: updatedTransaction.transaction_id.toString(),
+      perform_time: updatedTransaction.perform_time,
       state: TransactionState.Paid,
     },
   };

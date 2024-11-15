@@ -25,7 +25,7 @@ export async function cancelTransaction(
     };
   }
 
-  if (transaction.status === TransactionState.Paid) {
+  if (Number(transaction.status) === TransactionState.Paid) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotFound,
@@ -37,7 +37,7 @@ export async function cancelTransaction(
     const canceledTransaction = await this.prismaService.pay_balance.update({
       where: { id: transaction?.id },
       data: {
-        status: TransactionState.PaidCanceled,
+        status: TransactionState.PaidCanceled.toString(),
         state: TransactionState.PendingCanceled,
         canceled_at: new Date(),
         reason: cancelTransactionDto.params.reason,

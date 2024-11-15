@@ -49,7 +49,7 @@ export async function createTransaction(
   });
 
   if (transId) {
-    if (transId.status !== TransactionState.Pending) {
+    if (Number(transId.status) !== TransactionState.Pending) {
       return {
         error: PaymeError.CantDoOperation,
         id: transId.transaction_id,
@@ -90,7 +90,7 @@ export async function createTransaction(
       price: amount,
       transaction_id,
       state: TransactionState.Pending,
-      status: TransactionState.Pending,
+      status: TransactionState.Pending.toString(),
       system: pay_system.payme,
       created_at: new Date(),
       updated_at: new Date(),
