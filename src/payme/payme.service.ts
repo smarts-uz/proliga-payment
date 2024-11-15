@@ -54,7 +54,9 @@ export class PaymeService {
     return checkPerformTransaction.call(this, checkPerformTransactionDto);
   }
 
-  async createTransaction(CreateTransactionDto: CreateTransactionDto) {
+  async createTransaction(
+    CreateTransactionDto: CreateTransactionDto,
+  ) {
     return createTransaction.call(this, CreateTransactionDto);
   }
 

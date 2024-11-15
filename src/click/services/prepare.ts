@@ -99,11 +99,17 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Transaction canceled',
     };
   }
+
+  const existingTransaction = await this.prismaService.pay_balance.findUnique({
+    where: { transaction_id: transId.toString() },
+  });
+  
   if (existingTransaction) {
     return 'Transaction ID already exists.';
   }
+  
   const time = new Date();
-
+  
   await this.prismaService.pay_balance.create({
     data: {
       user_id: Number(userId),
