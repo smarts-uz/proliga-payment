@@ -96,8 +96,8 @@ export async function createTransaction(
       state: TransactionState.Pending,
       status: TransactionState.Pending.toString(),
       system: pay_system.payme,
-      created_at: Date.now(),
-      updated_at: Date.now(),
+      created_at: new Date(Date.now()),
+      updated_at: new Date(Date.now()),
     },
   });
 

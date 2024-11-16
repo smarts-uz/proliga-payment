@@ -39,7 +39,7 @@ export async function cancelTransaction(
       data: {
         status: TransactionState.PaidCanceled.toString(),
         state: TransactionState.PendingCanceled,
-        canceled_at: Date.now(),
+        canceled_at: new Date(Date.now()),
         reason: cancelTransactionDto.params.reason,
       },
     });
