@@ -95,7 +95,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   return {
     click_trans_id: Number(transId),
     merchant_trans_id: merchantTransId,
-    merchant_prepare_id: time,
+    merchant_prepare_id: time.getDate(),
     error: ClickError.Success,
     error_note: 'Success',
   };

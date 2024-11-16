@@ -80,7 +80,7 @@ export async function performTransaction(
   return {
     result: {
       transaction: updatedTransaction.transaction_id.toString(),
-      perform_time: updatedTransaction.perform_time,
+      perform_time: updatedTransaction.perform_time.getTime(),
       state: TransactionState.Paid,
     },
   };
