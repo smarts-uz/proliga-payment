@@ -42,7 +42,7 @@ export async function checkPerformTransaction(
     };
   }
 
-  if (price < PAYME_MIN_AMOUNT || price > PAYME_MAX_AMOUNT) {
+  if (price < Number(PAYME_MIN_AMOUNT) || price > Number(PAYME_MAX_AMOUNT)) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,
