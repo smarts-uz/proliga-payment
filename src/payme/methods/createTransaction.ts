@@ -57,7 +57,7 @@ export async function createTransaction(
     }
     return {
       result: {
-        balance: transId.price,
+        balance: Number(transId.price),
         transaction: transId.transaction_id,
         state: TransactionState.Pending,
         create_time: new Date(transId.created_at).getTime(),
@@ -84,7 +84,11 @@ export async function createTransaction(
     };
   }
 
-  const newTransaction = await this.prismaService.pay_balance.create({
+  const {
+    price,
+    transaction_id: transactionId,
+    created_at,
+  } = await this.prismaService.pay_balance.create({
     data: {
       user_id,
       price: amount,
@@ -97,12 +101,14 @@ export async function createTransaction(
     },
   });
 
+  console.log(Number(price), transactionId, new Date(created_at).getTime());
+
   return {
     result: {
-      balance: newTransaction.price,
-      transaction: newTransaction.transaction_id,
+      balance: Number(price), // Big Int => Number,
+      transaction: transactionId,
       state: TransactionState.Pending,
-      create_time: new Date(newTransaction.created_at).getTime(),
+      create_time: new Date(created_at).getTime(),
     },
   };
 }

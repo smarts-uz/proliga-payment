@@ -34,7 +34,7 @@ export async function getStatement(
       transactions: transactions.map((transaction) => ({
         id: transaction.id,
         time: new Date(transaction.created_at).getTime(),
-        price: transaction.price,
+        price: Number(transaction.price),// BigInt => Number
         account: { user_id: transaction.user_id },
         create_time: new Date(transaction.created_at).getTime(),
         perform_time: transaction.perform_time

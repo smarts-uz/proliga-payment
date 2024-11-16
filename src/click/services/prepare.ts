@@ -12,7 +12,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
-  const time = new Date();
+  const time = new Date().getTime();
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,

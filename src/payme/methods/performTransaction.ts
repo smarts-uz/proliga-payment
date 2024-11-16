@@ -68,7 +68,7 @@ export async function performTransaction(
     };
   }
 
-  const performTime = new Date();
+  const performTime = new Date().getTime();
 
   const updatedTransaction = await this.prismaService.pay_balance.update({
     where: { id: transaction.id },
