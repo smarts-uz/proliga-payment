@@ -12,7 +12,6 @@ import { CheckTransactionStatusDto } from './dto/check-status.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 
-
 @Injectable()
 export class UzumService {
   constructor(
@@ -24,7 +23,10 @@ export class UzumService {
     const serviceId = checkTransactionDto.serviceId;
 
     if (!this.checkServiceId(serviceId)) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.ErrorCheckingPaymentData);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.ErrorCheckingPaymentData,
+      );
     }
 
     return {
@@ -40,40 +42,49 @@ export class UzumService {
   }
 
   async create(createTransactionDto: CreateTransactionDto) {
-    const name = createTransactionDto.transId
+    const name = createTransactionDto.transId;
     const serviceId = createTransactionDto.serviceId;
     const transId = createTransactionDto.transId;
     const price = new Decimal(createTransactionDto.price);
 
     if (!this.checkServiceId(serviceId)) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.ErrorCheckingPaymentData);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.ErrorCheckingPaymentData,
+      );
     }
 
-    const existingTransaction = await this.prismaService.pay_balance.findUnique({
-      where: { id: Number(transId) },
-    });
+    const existingTransaction = await this.prismaService.pay_balance.findUnique(
+      {
+        where: { id: Number(transId) },
+      },
+    );
 
     if (existingTransaction) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.ErrorCheckingPaymentData, 'Transaction already exists');
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.ErrorCheckingPaymentData,
+        'Transaction already exists',
+      );
     }
 
     const transaction = await this.prismaService.pay_balance.create({
       data: {
         transaction_id: transId,
         user_id: Number(createTransactionDto.params.userId),
-        price:  Number(price),
+        price: Number(price),
         system: PAYMENTSYSTEM.UZUM,
         status: 'PENDING',
-        created_at: new Date(),
-        name: name
+        created_at: new Date(Date.now()),
+        name: name,
       },
     });
 
     return {
       serviceId,
-      timestamp: new Date().valueOf(),
+      timestamp: new Date(Date.now()),
       status: ResponseStatus.Created,
-      transTime: new Date().valueOf(),
+      transTime: new Date(Date.now()),
       transId: transaction.transaction_id,
       price: createTransactionDto.price,
     };
@@ -84,7 +95,10 @@ export class UzumService {
     const transId = confirmTransactionDto.transId;
 
     if (!this.checkServiceId(serviceId)) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.InvalidServiceId);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.InvalidServiceId,
+      );
     }
 
     const transaction = await this.prismaService.pay_balance.findUnique({
@@ -92,11 +106,17 @@ export class UzumService {
     });
 
     if (!transaction) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.AdditionalPaymentPropertyNotFound);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.AdditionalPaymentPropertyNotFound,
+      );
     }
 
     if (transaction.status !== 'PENDING') {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.PaymentAlreadyProcessed);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.PaymentAlreadyProcessed,
+      );
     }
 
     await this.prismaService.pay_balance.update({
@@ -120,7 +140,10 @@ export class UzumService {
     const transId = reverseTransactionDto.transId;
 
     if (!this.checkServiceId(serviceId)) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.InvalidServiceId);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.InvalidServiceId,
+      );
     }
 
     const transaction = await this.prismaService.pay_balance.findUnique({
@@ -128,7 +151,10 @@ export class UzumService {
     });
 
     if (!transaction) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.AdditionalPaymentPropertyNotFound);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.AdditionalPaymentPropertyNotFound,
+      );
     }
 
     await this.prismaService.pay_balance.update({
@@ -153,7 +179,10 @@ export class UzumService {
     const transId = checkTransactionDto.transId;
 
     if (!this.checkServiceId(serviceId)) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.InvalidServiceId);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.InvalidServiceId,
+      );
     }
 
     const transaction = await this.prismaService.pay_balance.findUnique({
@@ -161,7 +190,10 @@ export class UzumService {
     });
 
     if (!transaction) {
-      throw this.createBadRequestError(serviceId, ErrorStatusCode.AdditionalPaymentPropertyNotFound);
+      throw this.createBadRequestError(
+        serviceId,
+        ErrorStatusCode.AdditionalPaymentPropertyNotFound,
+      );
     }
 
     return {
@@ -171,7 +203,11 @@ export class UzumService {
     };
   }
 
-  private createBadRequestError(serviceId: number, errorCode: ErrorHttpStatusCode, message?: string) {
+  private createBadRequestError(
+    serviceId: number,
+    errorCode: ErrorHttpStatusCode,
+    message?: string,
+  ) {
     return new BadRequestException({
       serviceId,
       timestamp: new Date().valueOf(),
