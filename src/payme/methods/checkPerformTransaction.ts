@@ -1,14 +1,14 @@
-import { BalanceCheckPerformTransactionDto } from '../../dto/balance/check-perform-transaction.dto';
-import { ErrorStatusCodes } from '../../constants/error-status-codes';
+import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
-export async function BalanceCheckPerformTransaction(
+export async function checkPerformTransaction(
   this: any,
-  BalanceCheckPerformTransactionDto: BalanceCheckPerformTransactionDto,
+  checkPerformTransactionDto: CheckPerformTransactionDto,
 ) {
-  const userId = BalanceCheckPerformTransactionDto.params?.account?.user_id
-    ? Number(BalanceCheckPerformTransactionDto.params?.account?.user_id)
+  const userId = checkPerformTransactionDto.params?.account?.user_id
+    ? Number(checkPerformTransactionDto.params?.account?.user_id)
     : null;
-  const price = BalanceCheckPerformTransactionDto.params.amount;
+  const price = checkPerformTransactionDto.params.amount;
   const PAYME_MIN_AMOUNT = Number(process.env.PAYME_MIN_AMOUNT);
   const PAYME_MAX_AMOUNT = Number(process.env.PAYME_MAX_AMOUNT);
 

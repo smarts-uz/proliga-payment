@@ -1,8 +1,9 @@
 export enum TransactionMethods {
-BalanceCheckPerformTransaction  = 'BalanceCheckPerformTransaction',
-BalanceCreateTransaction = 'BalanceCreateTransaction',
-BalancePerformTransactio  = 'BalancePerformTransactio ',
-BalanceCancelTransaction = 'BalanceCancelTransaction',
-BalanceGetStatemen = 'BalanceGetStatemen',
-BalanceCheckTransaction = 'BalanceCheckTransaction'
+    CheckPerformTransaction = 'CheckPerformTransaction',
+    CreateTransaction = 'CreateTransaction',
+    CheckTransaction = 'CheckTransaction',
+    PerformTransaction = 'PerformTransaction',
+    CancelTransaction = 'CancelTransaction',
+    GetStatement = 'GetStatement',
   }
+  

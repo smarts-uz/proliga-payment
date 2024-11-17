@@ -1,16 +1,16 @@
-import { BalanceGetStatementDto } from '../../dto/balance/get-statement.dto';
+import { GetStatementDto } from '../dto/get-statement.dto';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
-import { ErrorStatusCodes } from '../../constants/error-status-codes';
+import { ErrorStatusCodes } from '../constants/error-status-codes';
 
 export async function getStatement(
   this: any,
-  BalanceGetStatementDto: BalanceGetStatementDto,
+  getStatementDto: GetStatementDto,
 ) {
   const transactions = await this.prismaService.pay_balance.findMany({
     where: {
       created_at: {
-        gte: new Date(BalanceGetStatementDto.params.from),
-        lte: new Date(BalanceGetStatementDto.params.to),
+        gte: new Date(getStatementDto.params.from),
+        lte: new Date(getStatementDto.params.to),
       },
       system: PAYMENTSYSTEM.PAYME,
     },

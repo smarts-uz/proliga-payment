@@ -1,6 +1,6 @@
-import { TransactionMethods } from '../../constants/transaction-methods';
+import { TransactionMethods } from '../constants/transaction-methods';
 
-export class BalanceCreateTransactionDto {
+export class CreateTransactionDto {
   method: TransactionMethods;
   params: {
     id: string;

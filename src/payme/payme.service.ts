@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionMethods } from './constants/transaction-methods';
-import { BalanceCheckPerformTransactionDto } from './dto/balance/check-perform-transaction.dto';
+import { CheckPerformTransactionDto } from './dto/check-perform-transaction.dto';
 import { PrismaService } from 'src/prisma.service';
 import { RequestBody } from './types/incoming-request-body';
-import { BalanceGetStatemenDto } from './dto/balance/get-statement.dto';
-import { BalanceCancelTransactionDto } from './dto/balance/cancel-transaction.dto';
-import { BalancePerformTransactioDto } from './dto/balance/perform-transaction.dto';
-import { BalanceCheckTransactionDto } from './dto/balance/check-transaction.dto';
-import { BalanceCreateTransactionDto } from './dto/balance/create-transaction.dto';
+import { GetStatementDto } from './dto/get-statement.dto';
+import { CancelTransactionDto } from './dto/cancel-transaction.dto';
+import { PerformTransactionDto } from './dto/perform-transaction.dto';
+import { CheckTransactionDto } from './dto/check-transaction.dto';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { DateTime } from 'luxon';
 
-import { BalanceCheckPerformTransaction } from './methods/balance/BalanceCheckPerformTransaction';
-import { BalanceCreateTransaction } from './methods/balance/createTransaction';
-import { BalanceCheckTransaction } from './methods/balance/checkTransaction';
-import { BalancePerformTransactio } from './methods/balance/performTransaction';
-import { BalanceCancelTransaction } from './methods/balance/cancelTransaction';
-import { BalanceGetStatemen } from './methods/balance/getStatement';
+import { checkPerformTransaction } from './methods/checkPerformTransaction';
+import { createTransaction } from './methods/createTransaction';
+import { checkTransaction } from './methods/checkTransaction';
+import { performTransaction } from './methods/performTransaction';
+import { cancelTransaction } from './methods/cancelTransaction';
+import { getStatement } from './methods/getStatement';
 
 export const CancelingReasons = {
   CanceledDueToTimeout: 'Canceled due to timeout',
@@ -29,54 +29,54 @@ export class PaymeService {
     const method = reqBody.method;
 
     switch (method) {
-      case TransactionMethods.BalanceCheckPerformTransaction:
-        return await this.BalanceCheckPerformTransaction(
-          reqBody as BalanceCheckPerformTransactionDto,
+      case TransactionMethods.CheckPerformTransaction:
+        return await this.checkPerformTransaction(
+          reqBody as CheckPerformTransactionDto,
         );
-      case TransactionMethods.BalanceCreateTransaction:
-        return await this.BalanceCreateTransaction(reqBody as BalanceCreateTransactionDto);
-      case TransactionMethods.BalancePerformTransactio:
-        return await this.BalancePerformTransactio(reqBody as BalancePerformTransactioDto);
-      case TransactionMethods.BalanceCancelTransaction:
-        return await this.BalanceCancelTransaction(reqBody as BalanceCancelTransactionDto);
-      case TransactionMethods.BalanceGetStatemen:
-        return await this.BalanceGetStatemen(reqBody as BalanceGetStatemenDto);
-      case TransactionMethods.BalanceCheckTransaction:
-        return await this.BalanceCheckTransaction(reqBody as BalanceCheckTransactionDto);
+      case TransactionMethods.CreateTransaction:
+        return await this.createTransaction(reqBody as CreateTransactionDto);
+      case TransactionMethods.PerformTransaction:
+        return await this.performTransaction(reqBody as PerformTransactionDto);
+      case TransactionMethods.CancelTransaction:
+        return await this.cancelTransaction(reqBody as CancelTransactionDto);
+      case TransactionMethods.GetStatement:
+        return await this.getStatement(reqBody as GetStatementDto);
+      case TransactionMethods.CheckTransaction:
+        return await this.checkTransaction(reqBody as CheckTransactionDto);
       default:
         return { error: 'Invalid transaction method' };
     }
   }
 
-  async BalanceCheckPerformTransaction(
-    BalanceCheckPerformTransactionDto: BalanceCheckPerformTransactionDto,
+  async checkPerformTransaction(
+    checkPerformTransactionDto: CheckPerformTransactionDto,
   ) {
-    return BalanceCheckPerformTransaction.call(this, BalanceCheckPerformTransactionDto);
+    return checkPerformTransaction.call(this, checkPerformTransactionDto);
   }
 
-  async BalanceCreateTransaction(
-    BalanceCreateTransactionDto: BalanceCreateTransactionDto,
+  async createTransaction(
+    CreateTransactionDto: CreateTransactionDto,
   ) {
-    return BalanceCreateTransaction.call(this, BalanceCreateTransactionDto);
+    return createTransaction.call(this, CreateTransactionDto);
   }
 
-  async BalanceCheckTransaction(BalanceCheckTransactionDto: BalanceCheckTransactionDto) {
-    return BalanceCheckTransaction.call(this, BalanceCheckTransactionDto);
+  async checkTransaction(checkTransactionDto: CheckTransactionDto) {
+    return checkTransaction.call(this, checkTransactionDto);
   }
 
-  async BalancePerformTransactio(BalancePerformTransactioDto: BalancePerformTransactioDto) {
-    return BalancePerformTransactio.call(this, BalancePerformTransactioDto);
+  async performTransaction(performTransactionDto: PerformTransactionDto) {
+    return performTransaction.call(this, performTransactionDto);
   }
 
-  async BalanceCancelTransaction(BalanceCancelTransactionDto: BalanceCancelTransactionDto) {
-    return BalanceCancelTransaction.call(this, BalanceCancelTransactionDto);
+  async cancelTransaction(cancelTransactionDto: CancelTransactionDto) {
+    return cancelTransaction.call(this, cancelTransactionDto);
   }
 
-  async BalanceGetStatemen(BalanceGetStatemenDto: BalanceGetStatemenDto) {
-    return BalanceGetStatemen.call(this, BalanceGetStatemenDto);
+  async getStatement(getStatementDto: GetStatementDto) {
+    return getStatement.call(this, getStatementDto);
   }
 
-  private BalanceCheckTransactionExpiration(created_at: Date) {
+  private checkTransactionExpiration(created_at: Date) {
     const transactionCreatedAt = new Date(created_at);
     const timeoutDuration = 300;
     const timeoutThreshold = DateTime.now()
