@@ -1,18 +1,18 @@
-import { CreateTransactionDto } from '../dto/create-transaction.dto';
-import { PaymeError } from '../constants/payme-error';
-import { TransactionState } from '../constants/transaction-state';
-import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
-import { TransactionMethods } from '../constants/transaction-methods';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalanceCreateTransactionDto } from '../../dto/balance/create-transaction.dto';
+import { PaymeError } from '../../constants/payme-error';
+import { TransactionState } from '../../constants/transaction-state';
+import { CheckPerformTransactionDto } from '../../dto/balance/check-perform-transaction.dto';
+import { TransactionMethods } from '../../constants/transaction-methods';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 import { pay_system } from '@prisma/client';
 
-export async function createTransaction(
+export async function BalanceCreateTransaction(
   this: any,
-  createTransactionDto: CreateTransactionDto,
+  BalanceCreateTransactionDto: BalanceCreateTransactionDto,
 ) {
-  const user_id = Number(createTransactionDto.params?.account?.user_id);
-  const amount = createTransactionDto.params.amount;
-  const transaction_id = createTransactionDto.params.id;
+  const user_id = Number(BalanceCreateTransactionDto.params?.account?.user_id);
+  const amount = BalanceCreateTransactionDto.params.amount;
+  const transaction_id = BalanceCreateTransactionDto.params.id;
 
   if (!user_id) {
     return {

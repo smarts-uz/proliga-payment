@@ -1,12 +1,12 @@
-import { CancelTransactionDto } from '../dto/cancel-transaction.dto';
-import { TransactionState } from '../constants/transaction-state';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalanceCancelTransactionDto } from '../../dto/balance/cancel-transaction.dto';
+import { TransactionState } from '../../constants/transaction-state';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 
-export async function cancelTransaction(
+export async function BalanceCancelTransaction(
   this: any,
-  cancelTransactionDto: CancelTransactionDto,
+  BalanceCancelTransactionDto: BalanceCancelTransactionDto,
 ) {
-  const transId = cancelTransactionDto.params.id;
+  const transId = BalanceCancelTransactionDto.params.id;
 
   const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: transId },
@@ -40,7 +40,7 @@ export async function cancelTransaction(
         status: TransactionState.PaidCanceled.toString(),
         state: TransactionState.PendingCanceled,
         canceled_at: new Date(Date.now()),
-        reason: cancelTransactionDto.params.reason,
+        reason: BalanceCancelTransactionDto.params.reason,
       },
     });
 

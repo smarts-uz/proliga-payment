@@ -1,4 +1,4 @@
-import { TransactionMethods } from '../constants/transaction-methods';
+import { TransactionMethods } from '../../constants/transaction-methods';
 
 
 export class GetStatementDto {

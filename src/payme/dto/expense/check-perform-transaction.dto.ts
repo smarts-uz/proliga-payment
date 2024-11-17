@@ -1,11 +1,12 @@
-import { TransactionMethods } from '../constants/transaction-methods';
+import { TransactionMethods } from '../../constants/transaction-methods';
 
 export class CheckPerformTransactionDto {
   method: TransactionMethods;
   params: {
     amount: number;
     account: {
-      user_id: string;
+      package_id: number;
+      team_id: number;
     };
   };
 }
