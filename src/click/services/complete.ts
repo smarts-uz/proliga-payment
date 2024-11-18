@@ -4,26 +4,26 @@ import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.inter
 import { ClickError } from 'src/enum/Payment.enum';
 
 export async function complete(this: any, clickReqBody: ClickRequestDto) {
-  const merchantTransId = clickReqBody.merchant_trans_id;
-  const userId = clickReqBody.user_id;
+  const userId = clickReqBody.merchant_trans_id;
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
+  const serviceId = clickReqBody.service_id;
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
-    merchantTransId,
-    serviceId: this.serviceId,
+    merchantTransId: userId,
+    serviceId,
     amount,
     action,
     signTime,
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash);
+  console.log(myMD5Hash, 'myMD5hash');
 
   if (signString !== myMD5Hash) {
     return {
@@ -93,7 +93,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
 
   return {
     click_trans_id: Number(transId),
-    merchant_trans_id: merchantTransId,
+    merchant_trans_id: userId,
     error: ClickError.Success,
     error_note: 'Success',
   };

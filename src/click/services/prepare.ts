@@ -5,10 +5,10 @@ import { ClickError } from 'src/enum/Payment.enum';
 import { TransactionStatus } from '../constants/status-codes';
 
 export async function prepare(this: any, clickReqBody: ClickRequestDto) {
-  const merchantTransId = clickReqBody.merchant_trans_id;
-  const userId = Number(clickReqBody.user_id);
+  const userId = clickReqBody.merchant_trans_id;
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
+  const serviceId = clickReqBody.service_id;
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
@@ -17,15 +17,15 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
-    merchantTransId,
-    serviceId: this.serviceId,
+    merchantTransId: userId,
+    serviceId,
     amount,
     action,
     signTime,
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash);
+  console.log(myMD5Hash, 'myMD5hash');
 
   if (signString !== myMD5Hash) {
     return {
@@ -34,7 +34,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  if (!userId || typeof userId !== 'number') {
+  if (!userId || typeof Number(userId) !== 'number') {
     return {
       error: ClickError.BadRequest,
       error_note: 'Invalid user_id, user_id must be number',
@@ -43,7 +43,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   const user = await this.prismaService.user.findUnique({
     where: {
-      id: userId,
+      id: Number(userId),
     },
   });
 
@@ -82,7 +82,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   await this.prismaService.pay_balance.create({
     data: {
-      user_id: userId,
+      user_id: Number(userId),
       transaction_id: transId.toString(),
       status: TransactionStatus.Pending,
       system: PAYMENTSYSTEM.CLICK,
@@ -94,7 +94,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   return {
     click_trans_id: Number(transId),
-    merchant_trans_id: merchantTransId,
+    merchant_trans_id: userId,
     merchant_prepare_id: time.getDate(),
     error: ClickError.Success,
     error_note: 'Success',

@@ -273,7 +273,7 @@ model pay_balance {
   id             Int             @id(map: "pay_expense_copy1_pkey") @default(autoincrement())
   name           String?         @db.VarChar(255)
   user_id        Int?
-  price          Int?
+  price          BigInt?
   system         pay_system_ext?
   transaction_id String?         @unique(map: "uk_transaction_id_py_balnce") @db.VarChar(255)
   currency_code  Int?            @db.SmallInt
@@ -298,7 +298,7 @@ model pay_expense {
   id               Int               @id @default(autoincrement())
   name             String?           @db.VarChar(255)
   pay_package_id   Int?
-  price            Int?
+  price            BigInt?
   user_id          Int?
   team_id          Int?
   pay_package_type pay_package_type?
@@ -308,19 +308,18 @@ model pay_expense {
   created_by       Int?
   updated_by       Int?
   deleted_by       Int?
-  amount           Float?            @db.Real
   competition_id   Int?
   system           pay_system?
   transaction_id   String?           @unique(map: "uk_transaction_id") @db.VarChar(32)
   currency_code    Int?              @db.SmallInt
   state            Int?
-  updated_time     DateTime?         @db.Timestamptz(6)
-  detail           String?           @db.VarChar(255)
+  status           String?           @db.VarChar(255)
   season_id        Int?
   perform_time     DateTime?         @db.Timestamptz(6)
   canceled_at      DateTime?         @db.Timestamptz(6)
   reason           Int?
   tour_id          Int?
+  amount           Float?            @db.Real
   season           season?           @relation(fields: [season_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_season_id")
   tour             tour?             @relation(fields: [tour_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tour_id")
   competition      competition?      @relation(fields: [competition_id], references: [id], onUpdate: SetNull)
@@ -861,6 +860,16 @@ enum config_key {
   smsTestingText
   eskiz_token
   MAILERSEND_API_TOKEN
+  cabinet_payme
+  cabinet_click
+  cabinet_uzum
+  checkout_payme
+  checkout_click
+  checkout_uzum
+  link_telegram
+  link_instagram
+  link_email
+  can_send_sms
 }
 
 enum config_type {

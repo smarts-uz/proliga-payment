@@ -44,8 +44,4 @@ export class ClickService {
   complete(clickReqBody: ClickRequestDto) {
     return complete.call(this, clickReqBody);
   }
-
-  private checkObjectId(id: number) {
-    return typeof id === 'number';
-  }
 }
