@@ -68,7 +68,7 @@ export async function createTransaction(
   const checkTransaction: CheckPerformTransactionDto = {
     method: TransactionMethods.CheckPerformTransaction,
     params: {
-      amount: amount,
+      amount,
       account: {
         user_id: user_id.toString(),
       },
@@ -91,7 +91,7 @@ export async function createTransaction(
   } = await this.prismaService.pay_balance.create({
     data: {
       user_id,
-      price: amount,
+      price: amount / 100,
       transaction_id,
       state: TransactionState.Pending,
       status: TransactionState.Pending.toString(),
@@ -100,8 +100,6 @@ export async function createTransaction(
       updated_at: new Date(Date.now()),
     },
   });
-
-  console.log(Number(price), transactionId, new Date(created_at).getTime());
 
   return {
     result: {
