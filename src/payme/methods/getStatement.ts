@@ -44,7 +44,7 @@ export async function getStatement(
           ? new Date(transaction.canceled_at).getTime()
           : 0,
         state: transaction.state,
-        reason: transaction.reason || 0,
+        reason: transaction.reason || null,
       })),
     },
   };
