@@ -1,6 +1,5 @@
 export class ConfirmTransactionDto {
-    serviceId: number;
-    timestamp: number;
-    transId: string;
-  }
-  
+  serviceId: number;
+  timestamp: number;
+  transId: string;
+}

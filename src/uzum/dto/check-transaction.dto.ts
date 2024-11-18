@@ -1,8 +1,7 @@
 export class CheckTransactionDto {
-    serviceId: number;
-    timestamp: number;
-    params: {
-      [key: string]: any;
-    };
-  }
-  
+  serviceId: number;
+  timestamp: number;
+  params: {
+    [key: string]: any;
+  };
+}

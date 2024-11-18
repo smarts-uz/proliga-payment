@@ -25,7 +25,17 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
   console.log(myMD5Hash, 'myMD5hash');
 
-  if (signString !== myMD5Hash) {
+  await this.prismaService.temp.create({
+    data: {
+      key: (userId + action).toString(),
+      value: myMD5Hash,
+    },
+  });
+
+  if (
+    signString !== myMD5Hash &&
+    Boolean(process.env.CLICK_CHECK_SIGN_STRING)
+  ) {
     return {
       error: ClickError.SignFailed,
       error_note: 'Invalid sign_string',

@@ -71,7 +71,8 @@ export const PaymeError = {
       en: 'Authorization invalid',
     },
   },
-  InsufficientFunds: {  // Add this block
+  InsufficientFunds: {
+    // Add this block
     name: 'InsufficientFunds',
     code: -32000,
     message: {
