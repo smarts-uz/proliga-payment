@@ -25,11 +25,10 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash, 'myMD5hash');
 
-  await this.prismaService.temp.create({
+  await this.prismaService.pay_signs.create({
     data: {
-      key: (userId + action).toString(),
+      key: (userId + '-' + action).toString(),
       value: myMD5Hash,
     },
   });
