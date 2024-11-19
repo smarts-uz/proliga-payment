@@ -2,10 +2,12 @@ import { PAYMENTSYSTEM } from 'src/enum/system.enum';
 import { ClickRequestDto } from '../dto/click-request.dto';
 import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.interface';
 import { ClickError } from 'src/enum/Payment.enum';
+import { TransactionActions } from '../constants/transaction-action';
 import { TransactionStatus } from 'src/utils/constants/proliga-status';
+import { pay_package_type } from '@prisma/client';
 
-export async function prepare(this: any, clickReqBody: ClickRequestDto) {
-  const userId = clickReqBody.merchant_trans_id;
+export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
+  const merchantTransId = clickReqBody.merchant_trans_id;
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
   const serviceId = clickReqBody.service_id;
@@ -13,11 +15,13 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
   const time = new Date(Date.now());
+  const teamId = merchantTransId.split('-')[0];
+  const packageId = merchantTransId.split('-')[1];
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
-    merchantTransId: userId,
+    merchantTransId,
     serviceId,
     amount,
     action,
@@ -28,7 +32,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   await this.prismaService.pay_signs.create({
     data: {
-      key: (userId + '-' + action).toString(),
+      key: (teamId + '-' + action).toString(),
       value: myMD5Hash,
     },
   });
@@ -43,27 +47,27 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  if (!userId || typeof Number(userId) !== 'number') {
+  if (!teamId || typeof Number(teamId) !== 'number') {
     return {
       error: ClickError.BadRequest,
-      error_note: 'Invalid user_id, user_id must be number',
+      error_note: 'Invalid team_id, team_id must be number',
     };
   }
 
-  const user = await this.prismaService.user.findUnique({
+  const existingTeam = await this.prismaService.team.findUnique({
     where: {
-      id: Number(userId),
+      id: Number(teamId),
     },
   });
 
-  if (!user) {
+  if (!existingTeam) {
     return {
       error: ClickError.UserNotFound,
       error_note: 'Invalid userId',
     };
   }
 
-  const existingTransaction = await this.prismaService.pay_balance.findUnique({
+  const existingTransaction = await this.prismaService.pay_expense.findUnique({
     where: {
       transaction_id: transId.toString(),
     },
@@ -89,11 +93,12 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  await this.prismaService.pay_balance.create({
+  await this.prismaService.pay_expense.create({
     data: {
-      user_id: Number(userId),
+      teamId_id: Number(teamId),
+      pay_package_id: packageId,
       transaction_id: transId.toString(),
-      status: TransactionStatus.PENDING,
+      status: TransactionActions.Prepare,
       system: PAYMENTSYSTEM.CLICK,
       price: amount,
       created_at: time,
@@ -103,7 +108,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
 
   return {
     click_trans_id: Number(transId),
-    merchant_trans_id: userId,
+    merchant_trans_id: merchantTransId,
     merchant_prepare_id: time.getDate(),
     error: ClickError.Success,
     error_note: 'Success',

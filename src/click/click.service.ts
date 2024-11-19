@@ -36,6 +36,24 @@ export class ClickService {
         };
     }
   }
+  
+  async handleExpenseMerchantTransactions(clickReqBody: ClickRequestDto) {
+    const actionType = Number(clickReqBody.action);
+
+    clickReqBody.amount = parseFloat(clickReqBody.amount.toString());
+
+    switch (actionType) {
+      case TransactionActions.Prepare:
+        return this.prepare(clickReqBody);
+      case TransactionActions.Complete:
+        return this.complete(clickReqBody);
+      default:
+        return {
+          error: ClickError.ActionNotFound,
+          error_note: 'Invalid action',
+        };
+    }
+  }
 
   prepare(clickReqBody: ClickRequestDto) {
     return prepare.call(this, clickReqBody);

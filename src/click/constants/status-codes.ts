@@ -14,9 +14,3 @@ export const ClickAction = {
   Prepare: 0,
   Complete: 1,
 };
-
-export const TransactionStatus = {
-  Pending: 'PENDING',
-  Paid: 'PAID',
-  Canceled: 'CANCELED',
-};

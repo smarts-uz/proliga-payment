@@ -22,7 +22,7 @@ export class HashingService {
   }
 
   public generateMD5(params: GenerateMd5HashParams, algo = 'md5'): string {
-    const content = `${params.clickTransId}${params.serviceId}${params.secretKey}${params.merchantTransId}${params.merchantPrepareId || ''}${params.amount}${params.action}${params.signTime}`;
+    const content = `${params.clickTransId}${params.serviceId}${params.secretKey}${params.merchantTransId}${params.amount}${params.action}${params.signTime}`;
     const hashFunc = createHash(algo);
     hashFunc.update(content);
     return hashFunc.digest('hex');

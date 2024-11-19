@@ -10,4 +10,11 @@ export class ClickController {
   async handleMerchantTransactions(@Body() clickReqBody: ClickRequestDto) {
     return await this.clickService.handleMerchantTransactions(clickReqBody);
   }
+  @Post('expense')
+  @HttpCode(HttpStatus.OK)
+  async handleExpenseMerchantTransactions(
+    @Body() clickReqBody: ClickRequestDto,
+  ) {
+    return await this.clickService.handleMerchantTransactions(clickReqBody);
+  }
 }

@@ -1,7 +1,8 @@
-import { TransactionStatus } from '../constants/status-codes';
 import { ClickRequestDto } from '../dto/click-request.dto';
 import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.interface';
 import { ClickError } from 'src/enum/Payment.enum';
+import { TransactionActions } from '../constants/transaction-action';
+import { TransactionStatus } from 'src/utils/constants/proliga-status';
 
 export async function complete(this: any, clickReqBody: ClickRequestDto) {
   const userId = clickReqBody.merchant_trans_id;
@@ -23,7 +24,6 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
   };
 
   const myMD5Hash = this.hashingService.generateMD5(myMD5Params);
-  console.log(myMD5Hash, 'myMD5hash');
 
   await this.prismaService.pay_signs.create({
     data: {
@@ -70,7 +70,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  if (isPreparedTransaction?.status === TransactionStatus.Paid) {
+  if (isPreparedTransaction?.status === TransactionStatus.PAID) {
     return {
       error: ClickError.AlreadyPaid,
       error_note: 'Already paid',
@@ -83,7 +83,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
         id: isPreparedTransaction.id,
       },
       data: {
-        status: TransactionStatus.Canceled,
+        status: TransactionStatus.CANCELLED,
       },
     });
     return {
@@ -97,7 +97,7 @@ export async function complete(this: any, clickReqBody: ClickRequestDto) {
       id: isPreparedTransaction.id,
     },
     data: {
-      status: TransactionStatus.Paid,
+      status: TransactionActions.Complete,
     },
   });
 
