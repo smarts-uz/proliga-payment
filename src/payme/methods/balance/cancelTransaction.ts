@@ -1,10 +1,10 @@
-import { CancelTransactionDto } from '../dto/cancel-transaction.dto';
-import { TransactionState } from '../constants/transaction-state';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalanceCancelTransactionDto } from '../../dto/balance/cancel-transaction.dto';
+import { TransactionState } from '../../constants/transaction-state';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 
-export async function cancelTransaction(
+export async function BalanceCancelTransaction(
   this: any,
-  cancelTransactionDto: CancelTransactionDto,
+  cancelTransactionDto: BalanceCancelTransactionDto,
 ) {
   const transId = cancelTransactionDto.params.id;
 

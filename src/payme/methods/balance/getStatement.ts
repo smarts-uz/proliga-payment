@@ -1,10 +1,10 @@
-import { GetStatementDto } from '../dto/get-statement.dto';
+import { BalanceGetStatementDto } from '../../dto/balance/get-statement.dto';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 
-export async function getStatement(
+export async function BalanceGetStatement(
   this: any,
-  getStatementDto: GetStatementDto,
+  getStatementDto: BalanceGetStatementDto,
 ) {
   const transactions = await this.prismaService.pay_balance.findMany({
     where: {

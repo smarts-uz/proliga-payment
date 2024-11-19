@@ -1,9 +1,9 @@
 export enum TransactionMethods {
-    CheckPerformTransaction = 'CheckPerformTransaction',
-    CreateTransaction = 'CreateTransaction',
-    CheckTransaction = 'CheckTransaction',
-    PerformTransaction = 'PerformTransaction',
-    CancelTransaction = 'CancelTransaction',
-    GetStatement = 'GetStatement',
+    BalanceCheckPerformTransaction = 'BalanceCheckPerformTransaction',
+    BalanceCreateTransaction = 'BalanceCreateTransaction',
+    BalanceCheckTransaction = 'BalanceCheckTransaction',
+    BalancePerformTransaction = 'BalancePerformTransaction',
+    BalanceCancelTransaction = 'BalanceCancelTransaction',
+    BalanceGetStatement = 'BalanceGetStatement',
   }
   

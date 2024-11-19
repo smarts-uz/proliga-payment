@@ -1,14 +1,14 @@
-import { CreateTransactionDto } from '../dto/create-transaction.dto';
-import { PaymeError } from '../constants/payme-error';
-import { TransactionState } from '../constants/transaction-state';
-import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
-import { TransactionMethods } from '../constants/transaction-methods';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalanceCreateTransactionDto } from '../../dto/balance/create-transaction.dto';
+import { PaymeError } from '../../constants/payme-error';
+import { TransactionState } from '../../constants/transaction-state';
+import { BalanceCheckPerformTransactionDto } from '../../dto/balance/check-perform-transaction.dto';
+import { TransactionMethods } from '../../constants/transaction-methods';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 import { pay_system } from '@prisma/client';
 
-export async function createTransaction(
+export async function BalanceCreateTransaction(
   this: any,
-  createTransactionDto: CreateTransactionDto,
+  createTransactionDto: BalanceCreateTransactionDto,
 ) {
   const user_id = Number(createTransactionDto.params?.account?.user_id);
   const amount = createTransactionDto.params.amount;
@@ -65,8 +65,8 @@ export async function createTransaction(
     };
   }
 
-  const checkTransaction: CheckPerformTransactionDto = {
-    method: TransactionMethods.CheckPerformTransaction,
+  const checkTransaction: BalanceCheckPerformTransactionDto = {
+    method: TransactionMethods.BalanceCheckPerformTransaction,
     params: {
       amount: amount,
       account: {
@@ -101,7 +101,6 @@ export async function createTransaction(
     },
   });
 
-  console.log(Number(price), transactionId, new Date(created_at).getTime());
 
   return {
     result: {

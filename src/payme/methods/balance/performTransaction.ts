@@ -1,12 +1,12 @@
-import { PerformTransactionDto } from '../dto/perform-transaction.dto';
-import { PaymeError } from '../constants/payme-error';
-import { TransactionState } from '../constants/transaction-state';
-import { CancelingReasons } from '../constants/canceling-reasons';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalancePerformTransactionDto } from '../../dto/balance/perform-transaction.dto';
+import { PaymeError } from '../../constants/payme-error';
+import { TransactionState } from '../../constants/transaction-state';
+import { CancelingReasons } from '../../constants/canceling-reasons';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 
-export async function performTransaction(
+export async function BalancePerformTransaction(
   this: any,
-  performTransactionDto: PerformTransactionDto,
+  performTransactionDto: BalancePerformTransactionDto,
 ) {
   const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: performTransactionDto.params.id },

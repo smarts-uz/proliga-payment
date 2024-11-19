@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionMethods } from './constants/transaction-methods';
-import { CheckPerformTransactionDto } from './dto/check-perform-transaction.dto';
+import { BalanceCheckPerformTransactionDto } from './dto/balance/check-perform-transaction.dto';
 import { PrismaService } from 'src/prisma.service';
 import { RequestBody } from './types/incoming-request-body';
-import { GetStatementDto } from './dto/get-statement.dto';
-import { CancelTransactionDto } from './dto/cancel-transaction.dto';
-import { PerformTransactionDto } from './dto/perform-transaction.dto';
-import { CheckTransactionDto } from './dto/check-transaction.dto';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { BalanceGetStatementDto } from './dto/balance/get-statement.dto';
+import { BalanceCancelTransactionDto } from '../payme/dto/balance/cancel-transaction.dto';
+import { BalancePerformTransactionDto } from './dto/balance/perform-transaction.dto';
+import { BalanceCheckTransactionDto } from './dto/balance/check-transaction.dto';
+import { BalanceCreateTransactionDto } from './dto/balance/create-transaction.dto';
 import { DateTime } from 'luxon';
 
-import { checkPerformTransaction } from './methods/checkPerformTransaction';
-import { createTransaction } from './methods/createTransaction';
-import { checkTransaction } from './methods/checkTransaction';
-import { performTransaction } from './methods/performTransaction';
-import { cancelTransaction } from './methods/cancelTransaction';
-import { getStatement } from './methods/getStatement';
+import { BalanceCheckPerformTransaction } from './methods/balance/checkPerformTransaction';
+import { BalanceCreateTransaction } from './methods/balance/createTransaction';
+import { BalanceCheckTransaction } from './methods/balance/checkTransaction';
+import { BalancePerformTransaction } from './methods/balance/performTransaction';
+import { BalanceCancelTransaction } from './methods/balance/cancelTransaction';
+import { BalanceGetStatement } from './methods/balance/getStatement';
 
 export const CancelingReasons = {
   CanceledDueToTimeout: 'Canceled due to timeout',
@@ -29,51 +29,51 @@ export class PaymeService {
     const method = reqBody.method;
 
     switch (method) {
-      case TransactionMethods.CheckPerformTransaction:
-        return await this.checkPerformTransaction(
-          reqBody as CheckPerformTransactionDto,
+      case TransactionMethods.BalanceCheckPerformTransaction:
+        return await this.BalanceCheckPerformTransaction(
+          reqBody as unknown as BalanceCheckPerformTransactionDto,
         );
-      case TransactionMethods.CreateTransaction:
-        return await this.createTransaction(reqBody as CreateTransactionDto);
-      case TransactionMethods.PerformTransaction:
-        return await this.performTransaction(reqBody as PerformTransactionDto);
-      case TransactionMethods.CancelTransaction:
-        return await this.cancelTransaction(reqBody as CancelTransactionDto);
-      case TransactionMethods.GetStatement:
-        return await this.getStatement(reqBody as GetStatementDto);
-      case TransactionMethods.CheckTransaction:
-        return await this.checkTransaction(reqBody as CheckTransactionDto);
+      case TransactionMethods.BalanceCreateTransaction:
+        return await this.BalanceCreateTransaction(reqBody as unknown as BalanceCreateTransactionDto);
+      case TransactionMethods.BalancePerformTransaction:
+        return await this.BalancePerformTransaction(reqBody as BalancePerformTransactionDto);
+      case TransactionMethods.BalanceCancelTransaction:
+        return await this.BalanceCancelTransaction(reqBody as BalanceCancelTransactionDto);
+      case TransactionMethods.BalanceGetStatement:
+        return await this.BalanceGetStatement(reqBody as unknown as BalanceGetStatementDto);
+      case TransactionMethods.BalanceCheckTransaction:
+        return await this.BalanceCheckTransaction(reqBody as BalanceCheckTransactionDto);
       default:
         return { error: 'Invalid transaction method' };
     }
   }
 
-  async checkPerformTransaction(
-    checkPerformTransactionDto: CheckPerformTransactionDto,
+  async BalanceCheckPerformTransaction(
+    BalanceCheckPerformTransactionDto: BalanceCheckPerformTransactionDto,
   ) {
-    return checkPerformTransaction.call(this, checkPerformTransactionDto);
+    return BalanceCheckPerformTransaction.call(this, BalanceCheckPerformTransactionDto);
   }
 
-  async createTransaction(
-    CreateTransactionDto: CreateTransactionDto,
+  async BalanceCreateTransaction(
+    CreateTransactionDto: BalanceCreateTransactionDto,
   ) {
-    return createTransaction.call(this, CreateTransactionDto);
+    return BalanceCreateTransaction.call(this, CreateTransactionDto);
   }
 
-  async checkTransaction(checkTransactionDto: CheckTransactionDto) {
-    return checkTransaction.call(this, checkTransactionDto);
+  async BalanceCheckTransaction(checkTransactionDto: BalanceCheckTransactionDto) {
+    return BalanceCheckTransaction.call(this, checkTransactionDto);
   }
 
-  async performTransaction(performTransactionDto: PerformTransactionDto) {
-    return performTransaction.call(this, performTransactionDto);
+  async BalancePerformTransaction(performTransactionDto: BalancePerformTransactionDto) {
+    return BalancePerformTransaction.call(this, performTransactionDto);
   }
 
-  async cancelTransaction(cancelTransactionDto: CancelTransactionDto) {
-    return cancelTransaction.call(this, cancelTransactionDto);
+  async BalanceCancelTransaction(BalanceCancelTransactionDto: BalanceCancelTransactionDto) {
+    return BalanceCancelTransaction.call(this, BalanceCancelTransactionDto);
   }
 
-  async getStatement(getStatementDto: GetStatementDto) {
-    return getStatement.call(this, getStatementDto);
+  async BalanceGetStatement(getStatementDto: BalanceGetStatementDto) {
+    return BalanceGetStatement.call(this, getStatementDto);
   }
 
   private checkTransactionExpiration(created_at: Date) {

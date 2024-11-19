@@ -1,10 +1,10 @@
-import { ErrorStatusCodes } from '../constants/error-status-codes';
-import { TransactionState } from '../constants/transaction-state';
-import { CheckTransactionDto } from '../dto/check-transaction.dto';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
+import { TransactionState } from '../../constants/transaction-state';
+import { BalanceCheckTransactionDto } from '../../dto/balance/check-transaction.dto';
 
-export async function checkTransaction(
+export async function BalanceCheckTransaction(
   this: any,
-  checkTransactionDto: CheckTransactionDto,
+  checkTransactionDto: BalanceCheckTransactionDto,
 ) {
   const transactionId = checkTransactionDto.params.id;
 

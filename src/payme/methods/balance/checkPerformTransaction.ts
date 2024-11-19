@@ -1,9 +1,9 @@
-import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto';
-import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { BalanceCheckPerformTransactionDto } from '../../dto/balance/check-perform-transaction.dto';
+import { ErrorStatusCodes } from '../../constants/error-status-codes';
 
-export async function checkPerformTransaction(
+export async function BalanceCheckPerformTransaction(
   this: any,
-  checkPerformTransactionDto: CheckPerformTransactionDto,
+  checkPerformTransactionDto: BalanceCheckPerformTransactionDto,
 ) {
   const userId = checkPerformTransactionDto.params?.account?.user_id
     ? Number(checkPerformTransactionDto.params?.account?.user_id)
