@@ -1,6 +1,7 @@
 import { CancelTransactionDto } from '../dto/cancel-transaction.dto';
 import { TransactionState } from '../constants/transaction-state';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { TransactionStatus } from 'src/utils/constants/proliga-status';
 
 export async function cancelTransaction(
   this: any,
@@ -37,7 +38,7 @@ export async function cancelTransaction(
     const canceledTransaction = await this.prismaService.pay_balance.update({
       where: { id: transaction?.id },
       data: {
-        status: TransactionState.PaidCanceled.toString(),
+        status: TransactionStatus.CANCELLED,
         state: TransactionState.PendingCanceled,
         canceled_at: new Date(Date.now()),
         reason: cancelTransactionDto.params.reason,

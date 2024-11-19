@@ -7,18 +7,20 @@ export async function completeExpense(
   this: any,
   clickReqBody: ClickRequestDto,
 ) {
-  const userId = clickReqBody.merchant_trans_id;
+  const merchantTransId = clickReqBody.merchant_trans_id;
   const amount = clickReqBody.amount;
   const transId = clickReqBody.click_trans_id;
+  const serviceId = clickReqBody.service_id;
   const signString = clickReqBody.sign_string;
   const action = clickReqBody.action;
   const signTime = clickReqBody.sign_time;
-  const serviceId = clickReqBody.service_id;
+  const teamId = merchantTransId.split('-')[0];
+  const packageId = merchantTransId.split('-')[1];
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
     secretKey: this.secretKey,
-    merchantTransId: userId,
+    merchantTransId: merchantTransId,
     serviceId,
     amount,
     action,
@@ -29,7 +31,7 @@ export async function completeExpense(
 
   await this.prismaService.pay_signs.create({
     data: {
-      key: (userId + '-' + action).toString(),
+      key: (teamId + '-' + packageId + '-' + action).toString(),
       value: myMD5Hash,
     },
   });
@@ -44,16 +46,16 @@ export async function completeExpense(
     };
   }
 
-  const user = await this.prismaService.user.findUnique({
+  const existingTeam = await this.prismaService.team.findUnique({
     where: {
-      id: Number(userId),
+      id: Number(teamId),
     },
   });
 
-  if (!user) {
+  if (!existingTeam) {
     return {
       error: ClickError.UserNotFound,
-      error_note: 'Invalid userId',
+      error_note: 'Invalid team_id',
     };
   }
 
@@ -105,7 +107,7 @@ export async function completeExpense(
 
   return {
     click_trans_id: Number(transId),
-    merchant_trans_id: userId,
+    merchant_trans_id: merchantTransId,
     error: ClickError.Success,
     error_note: 'Success',
   };

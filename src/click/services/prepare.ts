@@ -42,8 +42,7 @@ export async function prepare(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Invalid sign_string',
     };
   }
-
-  if (!userId || typeof Number(userId) !== 'number') {
+  if (!userId || /\d+/.test(userId)) {
     return {
       error: ClickError.BadRequest,
       error_note: 'Invalid user_id, user_id must be number',

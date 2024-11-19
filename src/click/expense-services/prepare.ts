@@ -4,7 +4,6 @@ import { GenerateMd5HashParams } from '../interfaces/generate-prepare-hash.inter
 import { ClickError } from 'src/enum/Payment.enum';
 import { TransactionActions } from '../constants/transaction-action';
 import { TransactionStatus } from 'src/utils/constants/proliga-status';
-import { pay_package_type } from '@prisma/client';
 
 export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
   const merchantTransId = clickReqBody.merchant_trans_id;
@@ -32,7 +31,7 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
 
   await this.prismaService.pay_signs.create({
     data: {
-      key: (teamId + '-' + action).toString(),
+      key: (teamId + '-' + packageId + '-' + action).toString(),
       value: myMD5Hash,
     },
   });
@@ -63,7 +62,7 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
   if (!existingTeam) {
     return {
       error: ClickError.UserNotFound,
-      error_note: 'Invalid userId',
+      error_note: 'Invalid team_id',
     };
   }
 
@@ -95,8 +94,8 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
 
   await this.prismaService.pay_expense.create({
     data: {
-      teamId_id: Number(teamId),
-      pay_package_id: packageId,
+      team_id: Number(teamId),
+      pay_package_id: Number(packageId),
       transaction_id: transId.toString(),
       status: TransactionActions.Prepare,
       system: PAYMENTSYSTEM.CLICK,

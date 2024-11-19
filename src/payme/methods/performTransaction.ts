@@ -3,6 +3,7 @@ import { PaymeError } from '../constants/payme-error';
 import { TransactionState } from '../constants/transaction-state';
 import { CancelingReasons } from '../constants/canceling-reasons';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
+import { TransactionStatus } from 'src/utils/constants/proliga-status';
 
 export async function performTransaction(
   this: any,
@@ -51,7 +52,7 @@ export async function performTransaction(
     await this.prismaService.pay_balance.update({
       where: { id: transaction.id },
       data: {
-        status: TransactionState.PendingCanceled.toString(),
+        status: TransactionStatus.CANCELLED,
         canceled_at: new Date(Date.now()),
         state: TransactionState.PendingCanceled,
         reason: Number(CancelingReasons.CanceledDueToTimeout),
@@ -71,7 +72,7 @@ export async function performTransaction(
   const updatedTransaction = await this.prismaService.pay_balance.update({
     where: { id: transaction.id },
     data: {
-      status: TransactionState.Paid.toString(),
+      status: TransactionStatus.PAID,
       state: TransactionState.Paid,
       perform_time: new Date(Date.now()),
     },

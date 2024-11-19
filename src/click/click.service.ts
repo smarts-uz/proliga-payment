@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { ClickError } from 'src/enum/Payment.enum';
 import { prepare } from './services/prepare';
 import { complete } from './services/complete';
+import { prepareExpense } from './expense-services/prepare';
+import { completeExpense } from './expense-services/complete';
 
 @Injectable()
 export class ClickService {
@@ -36,7 +38,7 @@ export class ClickService {
         };
     }
   }
-  
+
   async handleExpenseMerchantTransactions(clickReqBody: ClickRequestDto) {
     const actionType = Number(clickReqBody.action);
 
@@ -44,9 +46,9 @@ export class ClickService {
 
     switch (actionType) {
       case TransactionActions.Prepare:
-        return this.prepare(clickReqBody);
+        return this.prepareExpense(clickReqBody);
       case TransactionActions.Complete:
-        return this.complete(clickReqBody);
+        return this.completeExpense(clickReqBody);
       default:
         return {
           error: ClickError.ActionNotFound,
@@ -54,12 +56,20 @@ export class ClickService {
         };
     }
   }
-
+  // balance
   prepare(clickReqBody: ClickRequestDto) {
     return prepare.call(this, clickReqBody);
   }
 
   complete(clickReqBody: ClickRequestDto) {
     return complete.call(this, clickReqBody);
+  }
+  // expense
+  prepareExpense(clickReqBody: ClickRequestDto) {
+    return prepareExpense.call(this, clickReqBody);
+  }
+
+  completeExpense(clickReqBody: ClickRequestDto) {
+    return completeExpense.call(this, clickReqBody);
   }
 }

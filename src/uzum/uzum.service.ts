@@ -11,6 +11,7 @@ import { ReverseTransactionDto } from './dto/reverse-transaction.dto';
 import { CheckTransactionStatusDto } from './dto/check-status.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PAYMENTSYSTEM } from 'src/enum/system.enum';
+import { TransactionStatus } from 'src/utils/constants/proliga-status';
 
 @Injectable()
 export class UzumService {
@@ -74,7 +75,7 @@ export class UzumService {
         user_id: Number(createTransactionDto.params.userId),
         price: Number(price),
         system: PAYMENTSYSTEM.UZUM,
-        status: 'PENDING',
+        status: TransactionStatus.PENDING,
         created_at: new Date(Date.now()),
         name: name,
       },
@@ -112,7 +113,7 @@ export class UzumService {
       );
     }
 
-    if (transaction.status !== 'PENDING') {
+    if (transaction.status !== TransactionStatus.PENDING) {
       throw this.createBadRequestError(
         serviceId,
         ErrorStatusCode.PaymentAlreadyProcessed,
@@ -123,7 +124,7 @@ export class UzumService {
       where: { id: Number(transId) },
       data: {
         updated_at: new Date(),
-        status: 'PAID',
+        status: TransactionStatus.PAID,
       },
     });
 
@@ -161,7 +162,7 @@ export class UzumService {
       where: { id: Number(transId) },
       data: {
         created_at: new Date(),
-        status: 'CANCELED',
+        status: TransactionStatus.CANCELLED,
       },
     });
 

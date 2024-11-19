@@ -5,6 +5,7 @@ import { CheckPerformTransactionDto } from '../dto/check-perform-transaction.dto
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { pay_system } from '@prisma/client';
+import { TransactionStatus } from 'src/utils/constants/proliga-status';
 
 export async function createTransaction(
   this: any,
@@ -94,7 +95,7 @@ export async function createTransaction(
       price: amount / 100,
       transaction_id,
       state: TransactionState.Pending,
-      status: TransactionState.Pending.toString(),
+      status: TransactionStatus.PENDING,
       system: pay_system.payme,
       created_at: new Date(Date.now()),
       updated_at: new Date(Date.now()),
