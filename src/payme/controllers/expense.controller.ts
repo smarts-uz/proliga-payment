@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { PaymeService } from '../../payme/payme.service';
-import { RequestBody } from '../types/incoming-request-body';
+import { ExpenseRequestBody } from "../types/IncomingRequestBodyExpense";
 
 @Controller('expense')
 export class ExpenseController {
@@ -8,7 +8,7 @@ export class ExpenseController {
   sactions;
   @Post()
   @HttpCode(HttpStatus.OK)
-  async handleExpenseTransaction(@Body() reqBody: RequestBody) {
+  async handleExpenseTransaction(@Body() reqBody: ExpenseRequestBody) {
     const { method } = reqBody;
 
     switch (method) {
