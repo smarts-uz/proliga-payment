@@ -78,11 +78,11 @@ export async function checkPerformExpenseTransaction(
   if (selectedPackage.price !== price) {
     return {
       error: {
-        code: ErrorStatusCodes.TransactionNotAllowed,
+        code: ErrorStatusCodes.InvalidAmount,
         message: {
           uz: 'Paket narxi noto`g`ri',
           en: 'Package price is not correct',
-          ru: 'Package price is not correct',
+          ru: 'Сумма не соответствует пакету',
         },
       },
     };

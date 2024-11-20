@@ -12,6 +12,7 @@ export async function checkPerformTransaction(
   const PAYME_MIN_AMOUNT = Number(process.env.PAYME_MIN_AMOUNT);
   const PAYME_MAX_AMOUNT = Number(process.env.PAYME_MAX_AMOUNT);
 
+  console.log("oops")
   if (!userId) {
     return {
       error: {

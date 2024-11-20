@@ -1,13 +1,7 @@
-import {
-  CreateExpenseTransactionDto,
-  CreateTransactionDto,
-} from '../dto/create-transaction.dto';
+import { CreateExpenseTransactionDto } from '../dto/create-transaction.dto';
 import { PaymeError } from '../constants/payme-error';
 import { TransactionState } from '../constants/transaction-state';
-import {
-  CheckPerformExpenseTransactionDto,
-  CheckPerformTransactionDto,
-} from '../dto/check-perform-transaction.dto';
+import { CheckPerformExpenseTransactionDto } from '../dto/check-perform-transaction.dto';
 import { TransactionMethods } from '../constants/transaction-methods';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { pay_system } from '@prisma/client';
@@ -22,14 +16,14 @@ export async function createExpenseTransaction(
   const amount = createTransactionDto.params.amount;
   const transaction_id = createTransactionDto.params.id;
 
-  if (!team_id || package_id) {
+  if (!team_id || !package_id) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAuthorization,
         message: {
-          uz: 'Noto‘g‘ri avtorizatsiya',
-          en: 'Invalid authorization',
-          ru: 'Неверная авторизация',
+          uz: 'Malumot yetarli emas',
+          en: 'Not enough data',
+          ru: 'Недостаточно данных',
         },
       },
     };
@@ -54,24 +48,49 @@ export async function createExpenseTransaction(
   const selectedPackage = await this.prismaService.pay_package.findUnique({
     where: { id: package_id },
   });
+  if (!selectedPackage) {
+    return {
+      error: {
+        code: ErrorStatusCodes.TransactionNotAllowed,
+        message: {
+          uz: 'Paket topilmadi',
+          en: 'Package does not exist',
+          ru: 'Пакет не существует',
+        },
+      },
+    };
+  }
+  console.log(selectedPackage.price, amount);
+  if (selectedPackage.price !== amount) {
+    return {
+      error: {
+        code: ErrorStatusCodes.InvalidAmount,
+        message: {
+          uz: 'Paket narxi noto`g`ri',
+          en: 'Package price is not correct',
+          ru: 'Сумма не соответствует пакету',
+        },
+      },
+    };
+  }
 
-  const transId = await this.prismaServic.pay_expense.findUnique({
+  const transaction = await this.prismaService.pay_expense.findUnique({
     where: { transaction_id },
   });
 
-  if (transId) {
-    if (Number(transId.status) !== TransactionState.Pending) {
+  if (transaction) {
+    if (Number(transaction.status) !== TransactionStatus.PENDING) {
       return {
         error: PaymeError.CantDoOperation,
-        id: transId.transaction_id,
+        id: transaction.transaction_id,
       };
     }
     return {
       result: {
-        balance: Number(transId.price),
-        transaction: transId.transaction_id,
+        balance: Number(transaction.price),
+        transaction: transaction.transaction_id,
         state: TransactionState.Pending,
-        create_time: new Date(transId.created_at).getTime(),
+        create_time: new Date(transaction.created_at).getTime(),
       },
     };
   }
@@ -87,12 +106,12 @@ export async function createExpenseTransaction(
     },
   };
 
-  const checkResult = await this.checkPerformTransaction(checkTransaction);
+  const checkResult = await this.checkPerformExpenseTransaction(checkTransaction);
 
   if (checkResult.error) {
     return {
       error: checkResult.error,
-      id: transId?.transaction_id,
+      id: transaction?.transaction_id,
     };
   }
 
@@ -104,7 +123,7 @@ export async function createExpenseTransaction(
     data: {
       team_id,
       pay_package_id: package_id,
-      price: amount / 100,
+      price: selectedPackage.price,
       transaction_id,
       state: TransactionState.Pending,
       status: TransactionStatus.PENDING,

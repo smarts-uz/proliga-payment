@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionMethods } from './constants/transaction-methods';
-import { CheckPerformTransactionDto } from './dto/check-perform-transaction.dto';
+import {
+  CheckPerformTransactionDto,
+  CheckPerformExpenseTransactionDto
+} from './dto/check-perform-transaction.dto';
 import { PrismaService } from 'src/prisma.service';
 import { RequestBody } from './types/incoming-request-body';
 import { GetStatementDto } from './dto/get-statement.dto';
 import { CancelTransactionDto } from './dto/cancel-transaction.dto';
 import { PerformTransactionDto } from './dto/perform-transaction.dto';
 import { CheckTransactionDto } from './dto/check-transaction.dto';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import {
+  CreateExpenseTransactionDto,
+  CreateTransactionDto,
+} from './dto/create-transaction.dto';
 import { DateTime } from 'luxon';
 
 import { checkPerformTransaction } from './methods/checkPerformTransaction';
@@ -30,7 +36,7 @@ export const CancelingReasons = {
 
 @Injectable()
 export class PaymeService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   // Balance
   async handleTransactionMethods(reqBody: RequestBody) {
@@ -89,11 +95,11 @@ export class PaymeService {
     switch (method) {
       case TransactionMethods.CheckPerformTransaction:
         return await this.checkPerformExpenseTransaction(
-          reqBody as CheckPerformTransactionDto,
+          reqBody as unknown as CheckPerformExpenseTransactionDto,
         );
       case TransactionMethods.CreateTransaction:
         return await this.createExpenseTransaction(
-          reqBody as CreateTransactionDto,
+          reqBody as CreateExpenseTransactionDto,
         );
       case TransactionMethods.PerformTransaction:
         return await this.performExpenseTransaction(
@@ -115,15 +121,14 @@ export class PaymeService {
   }
 
   async checkPerformExpenseTransaction(
-    checkPerformTransactionDto: CheckPerformTransactionDto,
+    checkPerformTransactionDto: CheckPerformExpenseTransactionDto,
   ) {
-    return checkPerformExpenseTransaction.call(
-      this,
-      checkPerformTransactionDto,
-    );
+    return checkPerformExpenseTransaction.call(this, checkPerformTransactionDto);
   }
 
-  async createExpenseTransaction(CreateTransactionDto: CreateTransactionDto) {
+  async createExpenseTransaction(
+    CreateTransactionDto: CreateExpenseTransactionDto,
+  ) {
     return createExpenseTransaction.call(this, CreateTransactionDto);
   }
 

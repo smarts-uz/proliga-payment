@@ -45,23 +45,23 @@ export async function createTransaction(
     };
   }
 
-  const transId = await this.prismaService.pay_balance.findUnique({
+  const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id },
   });
 
-  if (transId) {
-    if (Number(transId.status) !== TransactionState.Pending) {
+  if (transaction) {
+    if (Number(transaction.status) !== TransactionState.Pending) {
       return {
         error: PaymeError.CantDoOperation,
-        id: transId.transaction_id,
+        id: transaction.transaction_id,
       };
     }
     return {
       result: {
-        balance: Number(transId.price),
-        transaction: transId.transaction_id,
+        balance: Number(transaction.price),
+        transaction: transaction.transaction_id,
         state: TransactionState.Pending,
-        create_time: new Date(transId.created_at).getTime(),
+        create_time: new Date(transaction.created_at).getTime(),
       },
     };
   }
@@ -81,7 +81,7 @@ export async function createTransaction(
   if (checkResult.error) {
     return {
       error: checkResult.error,
-      id: transId?.transaction_id,
+      id: transaction?.transaction_id,
     };
   }
 

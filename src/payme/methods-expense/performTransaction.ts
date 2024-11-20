@@ -69,7 +69,7 @@ export async function performExpenseTransaction(
     };
   }
 
-  const updatedTransaction = await this.prismaServic.pay_expense.update({
+  const updatedTransaction = await this.prismaService.pay_expense.update({
     where: { id: transaction.id },
     data: {
       status: TransactionStatus.PAID,
