@@ -9,3 +9,14 @@ export class CheckPerformTransactionDto {
     };
   };
 }
+
+export class CheckPerformExpenseTransactionDto {
+  method: TransactionMethods;
+  params: {
+    amount: number;
+    account: {
+      team_id: string;
+      package_id: string;
+    };
+  };
+}

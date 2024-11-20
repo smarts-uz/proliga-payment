@@ -18,4 +18,9 @@ export class PaymeController {
   async handleTransactionMethods(@Body() reqBody: RequestBody) {
     return await this.paymeService.handleTransactionMethods(reqBody);
   }
+  @Post('expense')
+  @HttpCode(HttpStatus.OK)
+  async handleExpenseTransactionMethods(@Body() reqBody: RequestBody) {
+    return await this.paymeService.handleExpenseTransactionMethods(reqBody);
+  }
 }

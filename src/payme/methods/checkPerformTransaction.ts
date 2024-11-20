@@ -25,11 +25,11 @@ export async function checkPerformTransaction(
     };
   }
 
-  const user_id = await this.prismaService.user.findUnique({
+  const user = await this.prismaService.user.findUnique({
     where: { id: userId },
   });
 
-  if (!user_id) {
+  if (!user) {
     return {
       error: {
         code: ErrorStatusCodes.TransactionNotAllowed,

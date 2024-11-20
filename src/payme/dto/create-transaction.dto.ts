@@ -11,3 +11,16 @@ export class CreateTransactionDto {
     };
   };
 }
+
+export class CreateExpenseTransactionDto {
+  method: TransactionMethods;
+  params: {
+    id: string;
+    time: number;
+    amount: number;
+    account: {
+      team_id: string;
+      package_id: string;
+    };
+  };
+}

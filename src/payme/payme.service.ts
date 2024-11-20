@@ -17,6 +17,13 @@ import { performTransaction } from './methods/performTransaction';
 import { cancelTransaction } from './methods/cancelTransaction';
 import { getStatement } from './methods/getStatement';
 
+import { checkExpenseTransaction } from './methods-expense/checkTransaction';
+import { createExpenseTransaction } from './methods-expense/createTransaction';
+import { cancelExpenseTransaction } from './methods-expense/cancelTransaction';
+import { getExpenseStatement } from './methods-expense/getStatement';
+import { checkPerformExpenseTransaction } from './methods-expense/checkPerformTransaction';
+import { performExpenseTransaction } from './methods-expense/performTransaction';
+
 export const CancelingReasons = {
   CanceledDueToTimeout: 'Canceled due to timeout',
 };
@@ -25,6 +32,7 @@ export const CancelingReasons = {
 export class PaymeService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  // Balance
   async handleTransactionMethods(reqBody: RequestBody) {
     const method = reqBody.method;
 
@@ -72,6 +80,69 @@ export class PaymeService {
 
   async getStatement(getStatementDto: GetStatementDto) {
     return getStatement.call(this, getStatementDto);
+  }
+
+  // Expense
+  async handleExpenseTransactionMethods(reqBody: RequestBody) {
+    const method = reqBody.method;
+
+    switch (method) {
+      case TransactionMethods.CheckPerformTransaction:
+        return await this.checkPerformExpenseTransaction(
+          reqBody as CheckPerformTransactionDto,
+        );
+      case TransactionMethods.CreateTransaction:
+        return await this.createExpenseTransaction(
+          reqBody as CreateTransactionDto,
+        );
+      case TransactionMethods.PerformTransaction:
+        return await this.performExpenseTransaction(
+          reqBody as PerformTransactionDto,
+        );
+      case TransactionMethods.CancelTransaction:
+        return await this.cancelExpenseTransaction(
+          reqBody as CancelTransactionDto,
+        );
+      case TransactionMethods.GetStatement:
+        return await this.getExpenseStatement(reqBody as GetStatementDto);
+      case TransactionMethods.CheckTransaction:
+        return await this.checkExpenseTransaction(
+          reqBody as CheckTransactionDto,
+        );
+      default:
+        return { error: 'Invalid transaction method' };
+    }
+  }
+
+  async checkPerformExpenseTransaction(
+    checkPerformTransactionDto: CheckPerformTransactionDto,
+  ) {
+    return checkPerformExpenseTransaction.call(
+      this,
+      checkPerformTransactionDto,
+    );
+  }
+
+  async createExpenseTransaction(CreateTransactionDto: CreateTransactionDto) {
+    return createExpenseTransaction.call(this, CreateTransactionDto);
+  }
+
+  async checkExpenseTransaction(checkTransactionDto: CheckTransactionDto) {
+    return checkExpenseTransaction.call(this, checkTransactionDto);
+  }
+
+  async performExpenseTransaction(
+    performTransactionDto: PerformTransactionDto,
+  ) {
+    return performExpenseTransaction.call(this, performTransactionDto);
+  }
+
+  async cancelExpenseTransaction(cancelTransactionDto: CancelTransactionDto) {
+    return cancelExpenseTransaction.call(this, cancelTransactionDto);
+  }
+
+  async getExpenseStatement(getStatementDto: GetStatementDto) {
+    return getExpenseStatement.call(this, getStatementDto);
   }
 
   private checkTransactionExpiration(created_at: Date) {
