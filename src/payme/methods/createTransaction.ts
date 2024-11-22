@@ -50,7 +50,7 @@ export async function createTransaction(
   });
 
   if (transaction) {
-    if (Number(transaction.status) !== TransactionState.Pending) {
+    if (transaction.status !== TransactionStatus.PENDING) {
       return {
         error: PaymeError.CantDoOperation,
         id: transaction.transaction_id,

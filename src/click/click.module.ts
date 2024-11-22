@@ -10,4 +10,4 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [ClickController],
   providers: [ClickService, PrismaService, HashingService],
 })
-export class ClickModule {}
+export class ClickModule { }

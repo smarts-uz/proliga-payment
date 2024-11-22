@@ -5,7 +5,7 @@ import { PaymeError } from 'src/payme/constants/payme-error';
 
 @Injectable()
 export class PaymeBasicAuthGuard implements CanActivate {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -30,10 +30,12 @@ export class PaymeBasicAuthGuard implements CanActivate {
       }
 
       const [username, password] = decoded.split(':');
+      console.log(username, password);
       const isValidUsername =
         this.configService.get<string>('PAYME_LOGIN') === username;
       const isValidPassword =
         this.configService.get<string>('PAYME_PASSWORD_TEST') === password;
+      console.log(this.configService.get<string>('PAYME_LOGIN'), this.configService.get<string>('PAYME_PASSWORD_TEST'));
 
       if (!isValidUsername || !isValidPassword) {
         response.status(200).send({

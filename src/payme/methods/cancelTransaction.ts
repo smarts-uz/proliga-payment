@@ -2,12 +2,14 @@ import { CancelTransactionDto } from '../dto/cancel-transaction.dto';
 import { TransactionState } from '../constants/transaction-state';
 import { ErrorStatusCodes } from '../constants/error-status-codes';
 import { TransactionStatus } from 'src/utils/constants/proliga-status';
+import { CancelingReasons } from '../constants/canceling-reasons';
 
 export async function cancelTransaction(
   this: any,
   cancelTransactionDto: CancelTransactionDto,
 ) {
   const transId = cancelTransactionDto.params.id;
+  const reason = Number(cancelTransactionDto.params?.reason);
 
   const transaction = await this.prismaService.pay_balance.findUnique({
     where: { transaction_id: transId },
@@ -50,6 +52,25 @@ export async function cancelTransaction(
         cancel_time: canceledTransaction.canceled_at?.getTime(),
         transaction: canceledTransaction.transaction_id.toString(),
         state: TransactionState.PendingCanceled,
+      },
+    };
+  }
+  if (reason === CancelingReasons.Refund) {
+    const canceledTransaction = await this.prismaService.pay_balance.update({
+      where: { id: transaction?.id },
+      data: {
+        status: TransactionStatus.CANCELLED,
+        state: TransactionState.PaidCanceled,
+        canceled_at: transaction?.canceled_at ? transaction.canceled_at : new Date(Date.now()),
+        perform_time: transaction?.perform_time ? transaction.perform_time : new Date(Date.now()),
+        reason: cancelTransactionDto.params.reason,
+      },
+    });
+    return {
+      result: {
+        state: TransactionState.PaidCanceled,
+        cancel_time: canceledTransaction.canceled_at?.getTime(),
+        transaction: canceledTransaction.transaction_id.toString(),
       },
     };
   }
