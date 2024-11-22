@@ -15,11 +15,11 @@ export async function checkExpenseTransaction(
   if (!transaction) {
     return {
       error: {
-        code: ErrorStatusCodes.InvalidAuthorization,
+        code: ErrorStatusCodes.TransactionNotFound,
         message: {
-          uz: 'Noto‘g‘ri avtorizatsiya',
-          en: 'Invalid authorization',
-          ru: 'Неверная авторизация',
+          uz: 'Tranzaksiya topilmadi',
+          en: 'Transaction not found',
+          ru: 'Транзакция не найдена',
         },
       },
     };

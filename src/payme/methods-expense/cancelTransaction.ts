@@ -9,7 +9,6 @@ export async function cancelExpenseTransaction(
   cancelTransactionDto: CancelTransactionDto,
 ) {
   const transId = cancelTransactionDto.params.id;
-  console.log(cancelTransactionDto.params)
   const reason = Number(cancelTransactionDto.params?.reason);
 
   const transaction = await this.prismaService.pay_expense.findUnique({
@@ -19,7 +18,7 @@ export async function cancelExpenseTransaction(
   if (!transaction) {
     return {
       error: {
-        code: ErrorStatusCodes.InvalidAuthorization,
+        code: ErrorStatusCodes.TransactionNotFound,
         message: {
           uz: 'Transacsiya topilmadi',
           en: 'Transaction not found ',
@@ -60,12 +59,12 @@ export async function cancelExpenseTransaction(
       where: { id: transaction?.id },
       data: {
         status: TransactionStatus.CANCELLED,
-        state: TransactionState.PendingCanceled,
+        state: TransactionState.PaidCanceled,
         canceled_at: transaction?.canceled_at ? transaction.canceled_at : new Date(Date.now()),
+        perform_time: transaction?.perform_time ? transaction.perform_time : new Date(Date.now()),
         reason: cancelTransactionDto.params.reason,
       },
     });
-
     return {
       result: {
         state: TransactionState.PaidCanceled,

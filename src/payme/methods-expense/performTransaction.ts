@@ -16,9 +16,9 @@ export async function performExpenseTransaction(
   if (!transaction) {
     return {
       error: {
-        code: ErrorStatusCodes.InvalidAuthorization,
+        code: ErrorStatusCodes.TransactionNotFound,
         message: {
-          uz: 'Transacsiya topilmadi',
+          uz: 'Transaksiya topilmadi',
           en: 'Transaction not found ',
           ru: 'Неверная transaction',
         },
