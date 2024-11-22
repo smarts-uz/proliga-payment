@@ -60,7 +60,7 @@ export async function createExpenseTransaction(
       },
     };
   }
-  console.log(selectedPackage.price, amount);
+  
   if (selectedPackage.price !== amount) {
     return {
       error: {
