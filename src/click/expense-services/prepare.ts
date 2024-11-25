@@ -19,7 +19,7 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
-    secretKey: this.secretKey,
+    secretKey: process.env.CLICK_EXPENSE_SECRET,
     merchantTransId,
     serviceId,
     amount,
@@ -65,6 +65,25 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
       error_note: 'Invalid team_id',
     };
   }
+
+  const existingPackage = await this.prismaService.pay_package.findUnique({
+    where: {
+      id: Number(packageId),
+    },
+  });
+
+  if (!existingPackage) {
+    return {
+      error: ClickError.BadRequest,
+      error_note: 'Invalid package_id',
+    };
+  }
+
+  console.log(
+    amount,
+    existingPackage?.price,
+    amount === existingPackage?.price,
+  );
 
   const existingTransaction = await this.prismaService.pay_expense.findUnique({
     where: {

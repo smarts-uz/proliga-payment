@@ -19,8 +19,8 @@ export async function completeExpense(
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
-    secretKey: this.secretKey,
-    merchantTransId: merchantTransId,
+    secretKey: process.env.CLICK_EXPENSE_SECRET,
+    merchantTransId,
     serviceId,
     amount,
     action,
