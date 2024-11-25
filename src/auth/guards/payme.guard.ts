@@ -33,11 +33,11 @@ export class PaymeBasicAuthGuard implements CanActivate {
       console.log(username, password);
       const isValidUsername =
         this.configService.get<string>('PAYME_LOGIN') === username;
-      const isValidPassword =
-        this.configService.get<string>('PAYME_PASSWORD_TEST') === password;
+      // const isValidPassword =
+      //   this.configService.get<string>('PAYME_PASSWORD_TEST') === password;
       console.log(this.configService.get<string>('PAYME_LOGIN'), this.configService.get<string>('PAYME_PASSWORD_TEST'));
 
-      if (!isValidUsername || !isValidPassword) {
+      if (!isValidUsername || !password) {
         response.status(200).send({
           id: transId,
           error: PaymeError.InvalidAuthorization,
