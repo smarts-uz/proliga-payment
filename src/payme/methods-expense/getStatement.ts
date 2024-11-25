@@ -35,7 +35,7 @@ export async function getExpenseStatement(
         id: transaction.id,
         time: new Date(transaction.created_at).getTime(),
         price: Number(transaction.price), // BigInt => Number
-        account: { user_id: transaction.user_id },
+        account: { team_id: transaction.team_id, package_id: transaction.pay_package_id },
         create_time: new Date(transaction.created_at).getTime(),
         perform_time: transaction.perform_time
           ? new Date(transaction.perform_time).getTime()
