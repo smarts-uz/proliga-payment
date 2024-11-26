@@ -59,6 +59,26 @@ export async function completeExpense(
     };
   }
 
+  const existingPackage = await this.prismaService.pay_package.findUnique({
+    where: {
+      id: Number(packageId),
+    },
+  });
+
+  if (!existingPackage) {
+    return {
+      error: ClickError.BadRequest,
+      error_note: 'Invalid package_id',
+    };
+  }
+
+  if (amount !== existingPackage?.price) {
+    return {
+      error: ClickError.InvalidAmount,
+      error_note: 'Invalid amount',
+    };
+  }
+
   const isPreparedTransaction = await this.prismaService.pay_expense.findUnique(
     {
       where: {

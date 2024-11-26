@@ -79,11 +79,12 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
     };
   }
 
-  console.log(
-    amount,
-    existingPackage?.price,
-    amount === existingPackage?.price,
-  );
+  if (amount !== existingPackage?.price) {
+    return {
+      error: ClickError.InvalidAmount,
+      error_note: 'Invalid amount',
+    };
+  }
 
   const existingTransaction = await this.prismaService.pay_expense.findUnique({
     where: {

@@ -22,7 +22,7 @@ export class ClickService {
   }
 
   async handleMerchantTransactions(clickReqBody: ClickRequestDto) {
-    const actionType = Number(clickReqBody.action);
+    const actionType = clickReqBody.action;
 
     if (!clickReqBody?.amount) {
       return {
@@ -30,10 +30,16 @@ export class ClickService {
         error_note: 'Invalid amount',
       };
     }
+    if (!actionType) {
+      return {
+        error: ClickError.ActionNotFound,
+        error_note: 'Invalid action',
+      };
+    }
 
     clickReqBody.amount = parseFloat(clickReqBody.amount.toString());
 
-    switch (actionType) {
+    switch (Number(actionType)) {
       case TransactionActions.Prepare:
         return this.prepare(clickReqBody);
       case TransactionActions.Complete:
@@ -47,17 +53,24 @@ export class ClickService {
   }
 
   async handleExpenseMerchantTransactions(clickReqBody: ClickRequestDto) {
-    const actionType = Number(clickReqBody.action);
+    const actionType = clickReqBody.action;
+
     if (!clickReqBody?.amount) {
       return {
         error: ClickError.InvalidAmount,
         error_note: 'Invalid amount',
       };
     }
+    if (!actionType) {
+      return {
+        error: ClickError.ActionNotFound,
+        error_note: 'Invalid action',
+      };
+    }
 
     clickReqBody.amount = parseFloat(clickReqBody.amount.toString());
-    console.log(actionType);
-    switch (actionType) {
+
+    switch (Number(actionType)) {
       case TransactionActions.Prepare:
         return this.prepareExpense(clickReqBody);
       case TransactionActions.Complete:
@@ -69,6 +82,7 @@ export class ClickService {
         };
     }
   }
+
   // balance
   prepare(clickReqBody: ClickRequestDto) {
     return prepare.call(this, clickReqBody);
