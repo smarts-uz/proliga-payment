@@ -60,8 +60,8 @@ export async function createExpenseTransaction(
       },
     };
   }
-  
-  if (selectedPackage.price !== amount) {
+
+  if (selectedPackage.price * 100 !== amount) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,
@@ -106,7 +106,8 @@ export async function createExpenseTransaction(
     },
   };
 
-  const checkResult = await this.checkPerformExpenseTransaction(checkTransaction);
+  const checkResult =
+    await this.checkPerformExpenseTransaction(checkTransaction);
 
   if (checkResult.error) {
     return {
