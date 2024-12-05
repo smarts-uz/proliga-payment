@@ -73,10 +73,7 @@ export async function completeExpense(
     };
   }
 
-  if (
-    amount !== existingPackage?.price &&
-    Boolean(process.env.PACKAGE_CHECK_PRICE)
-  ) {
+  if (amount !== existingPackage?.price) {
     return {
       error: ClickError.InvalidAmount,
       error_note: 'Invalid amount',
