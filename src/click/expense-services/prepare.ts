@@ -16,6 +16,7 @@ export async function prepareExpense(this: any, clickReqBody: ClickRequestDto) {
   const time = new Date(Date.now());
   const teamId = merchantTransId.split('-')[0];
   const packageId = merchantTransId.split('-')[1];
+  console.log(clickReqBody);
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,

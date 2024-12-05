@@ -61,10 +61,7 @@ export async function createExpenseTransaction(
     };
   }
 
-  if (
-    selectedPackage.price * 100 !== amount &&
-    Boolean(process.env.PACKAGE_CHECK_PRICE)
-  ) {
+  if (selectedPackage.price * 100 !== amount) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,

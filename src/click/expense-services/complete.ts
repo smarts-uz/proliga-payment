@@ -16,6 +16,7 @@ export async function completeExpense(
   const signTime = clickReqBody.sign_time;
   const teamId = merchantTransId.split('-')[0];
   const packageId = merchantTransId.split('-')[1];
+  console.log(clickReqBody);
 
   const myMD5Params: GenerateMd5HashParams = {
     clickTransId: transId,
