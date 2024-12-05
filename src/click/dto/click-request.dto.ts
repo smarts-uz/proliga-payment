@@ -5,6 +5,8 @@ export class ClickRequestDto {
   merchant_user_id?: string;
   merchant_trans_id: string;
   user_id?: number;
+  team_id?: number;
+  package_id?: number;
   amount: number;
   action: number;
   error: number;
