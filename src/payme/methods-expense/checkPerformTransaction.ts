@@ -75,7 +75,10 @@ export async function checkPerformExpenseTransaction(
     };
   }
 
-  if (selectedPackage.price * 100 !== price) {
+  if (
+    selectedPackage.price * 100 !== price &&
+    Boolean(process.env.PACKAGE_CHECK_PRICE)
+  ) {
     return {
       error: {
         code: ErrorStatusCodes.InvalidAmount,

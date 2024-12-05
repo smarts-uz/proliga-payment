@@ -24,22 +24,24 @@ model action {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model banner {
-  id          Int           @id(map: "advertisement_pkey") @default(autoincrement())
-  start_date  DateTime      @db.Date
-  end_date    DateTime      @db.Date
+  id          Int                  @id(map: "advertisement_pkey") @default(autoincrement())
+  start_date  DateTime             @db.Date
+  end_date    DateTime             @db.Date
   price       Int
-  is_active   Boolean       @default(false)
-  link        String?       @db.VarChar(255)
+  link        String?              @db.VarChar(255)
   content_url String?
-  name        String?       @db.VarChar(255)
-  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  deleted_at  DateTime?     @db.Timestamptz(6)
+  name        String?              @db.VarChar(255)
+  created_at  DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?            @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime?            @db.Timestamptz(6)
   created_by  Int?
   deleted_by  Int?
   updated_by  Int?
   banner_type banner_type?
   view_count  BigInt?
+  type        banner_service_type?
+  service_id  String?              @db.VarChar
+  is_mobile   Boolean?             @default(false)
   banner_view banner_view[]
 }
 
@@ -654,6 +656,7 @@ model tour {
   deleted_by       Int?
   is_last          Boolean?        @default(false)
   is_copy          Boolean?        @default(false)
+  name_ru          String?         @db.VarChar(255)
   match            match[]
   pay_expense      pay_expense[]
   player_point     player_point[]
@@ -732,6 +735,9 @@ model user {
   language                                         language?             @default(uz)
   enable_notification                              Boolean?              @default(true)
   phone_verified                                   Boolean?              @default(false)
+  visitor                                          String?               @db.VarChar(255)
+  visited_at                                       DateTime?             @db.Timestamptz(6)
+  geo                                              String?               @db.VarChar(255)
   card_card_created_byTouser                       card[]                @relation("card_created_byTouser")
   card_card_deleted_byTouser                       card[]                @relation("card_deleted_byTouser")
   card_card_updated_byTouser                       card[]                @relation("card_updated_byTouser")
@@ -1043,4 +1049,10 @@ enum user_event {
   buy_package_one_team
   player_buy
   player_sell
+}
+
+enum banner_service_type {
+  custom
+  yandex
+  google
 }
